@@ -1,0 +1,242 @@
+% vim: textwidth=99
+
+\documentclass[nobib, a4paper, twoside, justified]{tufte-book}
+
+\usepackage[utf8]{inputenc}
+\usepackage[UKenglish]{babel}
+\usepackage{csquotes}
+\usepackage[style=verbose, autocite=footnote, backend=biber]{biblatex}
+
+\title{Displaying Heraldic Blazons}
+\author{William Mathewson}
+\publisher{University of Edinburgh}
+\date{January 2018}
+
+\addbibresource{bibliography.bib}
+
+%%%%
+%%
+%% LOCALS are in `tufte-book-local.tex'
+
+\usepackage{graphicx} % allow embedded images
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{fancyvrb} % extended verbatim environments
+\usepackage{amsmath}
+\usepackage{xspace}
+\usepackage{makeidx}
+\usepackage{mathtools}
+
+\usepackage{float}
+\usepackage{subfig}
+
+\usepackage[final]{pdfpages}
+
+%% Tell hyperref packag it may break long URLs however it feels
+\usepackage{hyperref}
+\def\UrlBreaks{\do\/\do-}
+
+\newcommand{\dcim}{\emph{DCIM}\@\xspace}
+\newcommand{\ipam}{\emph{IPAM}\@\xspace}
+\newcommand{\dcimipam}{\emph{DCIM \& IPAM}\@\xspace}
+\newcommand{\desired}{\emph{desired}\@\xspace}
+\newcommand{\operational}{\emph{operational}\@\xspace}
+\newcommand{\wikid}{\textsc{WikiD}\@\xspace}
+\newcommand{\pywikid}{\textit{pywikid}\@\xspace}
+\newcommand{\tardis}{\textit{The Tardis Project}\@\xspace}
+\newcommand{\note}{\par\noindent{\fontsize{10}{12}\itshape Note}\vspace{0.2em}\par}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\pythonthree}{Python$3$\@\xspace}
+
+\newcommand{\defeq}{\stackrel{\mathclap{\normalfont\mbox{def}}}{=}}
+\newcommand{\namedmap}[1]{\stackrel{\mathclap{\mbox{\small#1}}}{\longmapsto}}
+
+%% R_{x->y} style
+\newcommand{\relate}[3]{\text{\itshape#1 }_{#2\ \mapsto\ #3}}
+
+%% x --R--> y style
+%\newcommand{\relate}[3]{#2\namedmap{#1}#3}
+
+%% xRy style
+%\newcommand{\relate}[3]{_{#2}#1_{#3}}
+
+\newcommand{\citetodo}{\sidenote{\todo{[Citation Needed]}}\@\xspace}
+\newcommand{\reftodo}{\sidenote{\todo{[Reference Needed]}}\@\xspace}
+\newcommand{\prooftodo}{\sidenote{\todo{[Substantiation Needed]}}\@\xspace}
+\newcommand{\todo}[1]{{\noindent\textcolor{Red}{\textit{\quad#1}}\par}}
+
+%%  Service description table
+%
+\newcommand{\servicedesc}[4]{%
+  \vspace{\baselineskip}%
+  \noindent%
+  {%
+    \footnotesize%
+    \begin{tabular}{llll}%
+      \textbf{Service Name}  & \textbf{Type}  & \textbf{Graph} & \textbf{Integrates with}\\%
+      #1                     & #2             & #4             & #3  \\%
+    \end{tabular}%
+  }%
+  \vspace{\baselineskip}%
+}
+
+\let\lines\baselineskip
+
+\begin{document}
+
+\frontmatter
+
+\maketitlepage
+
+%\abstract{This is an example of {\tt infthesis} style.  The file {\tt
+%skeleton.tex} generates this document and can be used to get a ``skeleton''
+%for your thesis.  The abstract should summarise your report and fit in the
+%space on the first page.
+%%
+%You may, of course, use any other software to write your report, as long as
+%you follow the same style. That means: producing a title page as given here,
+%and including a table of contents and bibliography.  }
+
+\begin{publicationmeta}
+  \section*{Acknowledgements}
+  % TODO: Think of people to acknowledge I'd like to acknowledge Jesus for
+  % swapping bottles whilst I was drinking them. It was really difficult to find
+  % him at the bottom, so I had to keep drinking.
+
+  \section*{Declaration}
+  I declare that this thesis was composed by myself,
+  that the work contained herein is my own
+  except where explicitly stated otherwise in the text,
+  and that this work has not been submitted for any other degree or
+  professional qualification except as specified.\par
+  ({\textit \thanklessauthor})
+\end{publicationmeta}
+
+\tableofcontents
+
+%\pagenumbering{Arabic}
+
+\mainmatter
+
+\chapter{Introduction}\label{cha:introduction}
+
+\section{Motivation}\label{sec:motivation}
+
+In 1874 --- 4 years after his death --- John Papworth's \textit{Ordinary of British Armorials} was
+published~\autocite{collins_1942}. In this work, he recorded approximately 50,000 entries of
+descriptions of families' coats of arms, none annotated.
+
+This honours project would make it possible to have these descriptions, or \textit{blazons} as they
+are termed in heraldry (see~\ref{sec:heraldry}), drawn freely for people to view. This has
+potential application for ancestry companies that build family trees for people. Given the blazon,
+they would be able to construct the shields visually.
+
+\section{Contributions}\label{sec:contributions}
+
+In this honours project, my contributions included:
+
+\begin{itemize}
+  \item Drawing many of the charges used in the coats of arms
+  \item Writing the base web server
+  \item Writing the charge drawing algorithm
+\end{itemize}
+
+\chapter{Background}\label{cha:background}
+
+\section{Heraldry}\label{sec:heraldry}
+
+Many families, countries and organisations --- primarily in Europe --- have coats of arms. At the
+centre of a coat of arms is a shield known as an \textit{escutcheon}. The language used to describe
+how the escutcheon is to be drawn is known as a \textit{blazon}. Blazons have been used since the
+Norman conquest and have been refined to a regular language in the process~\autocite{boutell_1864},
+although, as John Brooke-Little said, ``many of the supposedly hard and fast rules laid down in
+heraldic manuals [including those by heralds] are often ignored.''~\autocite{brooke_little_1985}
+This flagrant disregard for the rules introduces difficulty in parsing the blazons as the language
+loses some of its regularity.
+
+Blazons have a few key attributes:
+\begin{itemize}
+  \item The \textit{field}, which is the background of the shield;
+  \item \textit{Variations}, which describe how the field or charge are patterened. Variations can
+    indicate patterns such as chequered or coloured lines (an example can be seen in
+    Figure~\ref{fig:blason_albert});
+  \item \textit{Ordinaries}, which are geometric shapes (an example of which can be seen in
+    Figure~\ref{fig:scrope});
+  \item \textit{Charges}, which are small emblems, such as fleur-de-lis and lions; and
+  \item \textit{Tinctures}, which are the colours and patterns for charges, ordinaries and fields.
+\end{itemize}
+
+\begin{marginfigure}
+  \centering
+  \def\svgwidth{0.8\linewidth}
+  \input{graphics/Blason_Albert.pdf_tex}
+  \caption{The shield of the town of Albert, France. \textit{Barry of ten argent and
+  gules}. Source:~\url{https://en.wikipedia.org/wiki/File:Blason_Albert.svg}}\label{fig:blason_albert}
+\end{marginfigure}
+
+The tinctures are derived from Norman French and are divided into 3 groups, typically known as
+\textit{metals}, \textit{colours} and \textit{furs}. In British heraldry, the colours are derived
+from Norman French and so the names can look archaic. In heraldry, blue is \textit{azure} and red
+is \textit{gules} for instance. The metals are \textit{or} and \textit{argent} for gold and silver
+respectively. Whilst the tinctures are named explicitly, the College of Arms does not define fixed
+colours for the tinctures, leaving it to the artist to decide~\autocite{college_of_arms_faq}.
+
+Blazons conventionally follow a form of starting with the \textit{tincture} or \textit{variation}
+of the field. After the description of the field, \textit{ordinaries} (geometric shapes as seen in
+Figure~\ref{fig:scrope}) and \textit{charges} (small emblems, such as fleur-de-lis and lions) are
+named with their tinctures.
+
+% Should probably take out the history lesson
+A simple --- but notable --- blazon is that of the Scrope family. In the 14th century, the Baron
+Scrope brought a case action against Sir Roberts Grosvenor when he noticed that they both had the
+same coat of arms. Many witnesses gave evidence in the case, including Geoffrey
+Chaucer~\autocite{scrope_grosvenor}. The case was ultimately decided in Scrope's favour. The Scrope
+coat of arms has a blazon of \textit{Azure, a bend Or}; a depiction of this as drawn by the web app
+written for this project can be seen in Figure~\ref{fig:scrope}.
+
+\begin{marginfigure}
+  \centering
+  \def\svgwidth{0.8\linewidth}
+  \input{graphics/scrope.pdf_tex}
+  \caption{The Scrope escutcheon; \textit{Azure, a bend Or}.}\label{fig:scrope}
+\end{marginfigure}
+
+%\pagebreak
+
+Whilst the Scrope arms are prominent in heraldry, they are simplistic and indicative of
+medi\ae{}val arms. Coats of arms became more complex as they developed through the centuries, with
+instances of quarterly shields, grand-quarterlies --- quarterlies within quarterlies --- and
+\textit{differenced} arms. Examples of more complex shields can be seen in
+Figure~\ref{fig:complex_shields}.
+
+\begin{figure*}[h]
+  \subfloat[Neville, 16th Earl of Warwick's coat of arms. An example of grand-quarterlies and
+  differenced arms. Source:~\url{https://en.wikipedia.org/wiki/File:Neville_Warwick_Arms.svg}.]{%
+    \def\svgwidth{0.3\linewidth} %
+    \input{graphics/Neville_Warwick_Arms.pdf_tex}
+  }
+  \qquad
+  \subfloat[Arms of Leveson-Gower, Earl Granville. An example of quarterlies with differenced
+  arms. Source:~\url{https://en.wikipedia.org/wiki/File:LevesonGowerEarlGranvilleArms.png}.]{%
+    \includegraphics[width=0.3\linewidth]{LevesonGowerEarlGranvilleArms.png}
+  }
+  \caption{Some examples of more complex coats of arms.}\label{fig:complex_shields}
+\end{figure*}
+
+For a time, it was considered bad form to repeat a \textit{tincture} in a blazon, and use a
+reference to the tincture's previous use. The Heraldic Society gives an example as such:
+``\textit{`Azure on a fess argent three billets azure'} [would have been written as] \textit{`Azure
+on a fess argent three billets of the first'}''. The `\textit{of the first}' refers to the field's
+tincture of azure. This blazon describes a blue shield, with a white bar horizontally across the
+middle with 3 white rectangles arranged along the bar. The Heraldic Society advocates in favour of
+repeating tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
+
+\backmatter
+
+\printbibliography[heading=bibintoc]
+
+\end{document}
