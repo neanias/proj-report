@@ -1,9 +1,9 @@
-% vim: textwidth=99
+% vim: textwidth=99 spell spelllang=en_gb:
 
 \documentclass[nobib, a4paper, twoside, justified]{tufte-book}
 
 \usepackage[utf8]{inputenc}
-\usepackage[UKenglish]{babel}
+\usepackage[british]{babel}
 \usepackage{csquotes}
 \usepackage[style=verbose, autocite=footnote, backend=biber]{biblatex}
 
@@ -103,9 +103,9 @@
 
 \begin{publicationmeta}
   \section*{Acknowledgements}
-  % TODO: Think of people to acknowledge I'd like to acknowledge Jesus for
-  % swapping bottles whilst I was drinking them. It was really difficult to find
-  % him at the bottom, so I had to keep drinking.
+  % TODO: Think of people to acknowledge
+  % I'd like to acknowledge Jesus for swapping bottles whilst I was drinking them. It was really
+  % difficult to find him at the bottom, so I had to keep drinking.
 
   \section*{Declaration}
   I declare that this thesis was composed by myself,
@@ -140,9 +140,9 @@ they would be able to construct the shields visually.
 In this honours project, my contributions included:
 
 \begin{itemize}
-  \item Drawing many of the charges used in the coats of arms
-  \item Writing the base web server
-  \item Writing the charge drawing algorithm
+  \item Drawing the charges and quarters used on the shield, \textit{escutcheon},
+  \item Writing the base web server and
+  \item Writing the quarter and charge drawing algorithm
 \end{itemize}
 
 \chapter{Background}\label{cha:background}
@@ -161,7 +161,7 @@ loses some of its regularity.
 Blazons have a few key attributes:
 \begin{itemize}
   \item The \textit{field}, which is the background of the shield;
-  \item \textit{Variations}, which describe how the field or charge are patterened. Variations can
+  \item \textit{Variations}, which describe how the field or charge are patterned. Variations can
     indicate patterns such as chequered or coloured lines (an example can be seen in
     Figure~\ref{fig:blason_albert});
   \item \textit{Ordinaries}, which are geometric shapes (an example of which can be seen in
@@ -180,15 +180,25 @@ Blazons have a few key attributes:
 
 The tinctures are derived from Norman French and are divided into 3 groups, typically known as
 \textit{metals}, \textit{colours} and \textit{furs}. In British heraldry, the colours are derived
-from Norman French and so the names can look archaic. In heraldry, blue is \textit{azure} and red
-is \textit{gules} for instance. The metals are \textit{or} and \textit{argent} for gold and silver
-respectively. Whilst the tinctures are named explicitly, the College of Arms does not define fixed
-colours for the tinctures, leaving it to the artist to decide~\autocite{college_of_arms_faq}.
+from Norman French and so the names appear archaic. In heraldry, blue is \textit{azure} and red is
+\textit{gules} for instance. The metals are \textit{or} and \textit{argent} for gold and silver
+respectively. Whilst the tinctures are linked to colours, the College of Arms does not which shade
+of that colour is required for the tinctures, leaving it to the artist to
+decide~\autocite{college_of_arms_faq}.
 
 Blazons conventionally follow a form of starting with the \textit{tincture} or \textit{variation}
-of the field. After the description of the field, \textit{ordinaries} (geometric shapes as seen in
-Figure~\ref{fig:scrope}) and \textit{charges} (small emblems, such as fleur-de-lis and lions) are
-named with their tinctures.
+of the field. After the description of the field, \textit{ordinaries} and \textit{charges} are
+named with their tinctures. An example of this is ``\textit{Purpure, a chief Gules}''. This blazon
+describes an escutcheon with a field of \textit{purpure} (purple), with a \textit{Chief ordinary}
+--- a bar across the top of the shield --- of \textit{gules} (red). This can be seen drawn by the
+web app in Figure~\ref{fig:chief_example}.
+
+\begin{marginfigure}
+  \centering
+  \def\svgwidth{0.8\linewidth}
+  \input{graphics/chief_example.pdf_tex}
+  \caption{\textit{Purpure, a chief Gules}.}\label{fig:chief_example}
+\end{marginfigure}
 
 % Should probably take out the history lesson
 A simple --- but notable --- blazon is that of the Scrope family. In the 14th century, the Baron
@@ -209,8 +219,12 @@ written for this project can be seen in Figure~\ref{fig:scrope}.
 
 Whilst the Scrope arms are prominent in heraldry, they are simplistic and indicative of
 medi\ae{}val arms. Coats of arms became more complex as they developed through the centuries, with
-instances of quarterly shields, grand-quarterlies --- quarterlies within quarterlies --- and
-\textit{differenced} arms. Examples of more complex shields can be seen in
+instances of \textit{quarterly} shields, \textit{grand-quarterlies} --- quarterlies within
+quarterlies --- and \textit{differenced} arms. \textit{Differenced} arms involve adding an
+\textit{ordinary} over an existing coat of arms. This was typically used to differentiate similar
+looking coats of arms, especially between father and sons. Common examples of differentiated
+shields are seen in duchies' coats of arms, particularly those which were given to Charles II's
+illegitimate children. Examples of more complex shields can be seen in
 Figure~\ref{fig:complex_shields}.
 
 \begin{figure*}[h]
@@ -220,9 +234,11 @@ Figure~\ref{fig:complex_shields}.
     \input{graphics/Neville_Warwick_Arms.pdf_tex}
   }
   \qquad
-  \subfloat[Arms of Leveson-Gower, Earl Granville. An example of quarterlies with differenced
-  arms. Source:~\url{https://en.wikipedia.org/wiki/File:LevesonGowerEarlGranvilleArms.png}.]{%
-    \includegraphics[width=0.3\linewidth]{LevesonGowerEarlGranvilleArms.png}
+  \subfloat[A quarterly shield drawn by the web app. \textit{Quarterly: 1st and 4th: Gules, a bend
+  Sable; 2nd and 3rd: Azure, a chief Or}. ]{%
+    \def\svgwidth{0.28\linewidth}
+    \input{graphics/quarterly_example.pdf_tex}
+    %\includegraphics[width=0.3\linewidth]{LevesonGowerEarlGranvilleArms.png}
   }
   \caption{Some examples of more complex coats of arms.}\label{fig:complex_shields}
 \end{figure*}
@@ -232,8 +248,52 @@ reference to the tincture's previous use. The Heraldic Society gives an example 
 ``\textit{`Azure on a fess argent three billets azure'} [would have been written as] \textit{`Azure
 on a fess argent three billets of the first'}''. The `\textit{of the first}' refers to the field's
 tincture of azure. This blazon describes a blue shield, with a white bar horizontally across the
-middle with 3 white rectangles arranged along the bar. The Heraldic Society advocates in favour of
-repeating tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
+middle with 3 white rectangles arranged along the bar. The Heraldic Society advocates repeating
+tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
+
+\section{Related Works}%
+\label{sec:related_works}
+
+Whilst many escutcheons have been drawn and uploaded to WikiMedia in SVG format (some of which have
+been used in this report), all appear to have been drawn by hand in programmes such as Inkscape.
+
+\section{Summary}%
+%\label{sec:background_summary}
+
+\chapter{Implementation}%
+\label{cha:implementation}
+
+\section{Initial Design}%
+\label{sec:initial_design}
+
+\section{Initial Approach}%
+\label{sec:initial_approach}
+
+\section{Adding Quarterly Rendering}%
+\label{sec:adding_quarterly_rendering}
+
+\section{Refactoring Charge Rendering}%
+\label{sec:refactoring_charge_rendering}
+
+\chapter{Results and Discussion}%
+\label{cha:results_and_discussion}
+
+\section{Automated Testing}%
+\label{sec:automated_testing}
+
+\section{Rendering Testing}%
+\label{sec:rendering_testing}
+
+\chapter{Conclusion}%
+\label{cha:conclusion}
+
+\section{Overview}%
+\label{sec:overview}
+
+\section{Further Work}%
+\label{sec:further_work}
+
+
 
 \backmatter
 
