@@ -50,6 +50,8 @@
 \newcommand{\code}[1]{\texttt{#1}}
 %\newcommand{\pythonthree}{Python$3$\@\xspace}
 
+\newcommand{\footnoteurl}[1]{\footnote{\url{#1}}}
+
 %\newcommand{\defeq}{\stackrel{\mathclap{\normalfont\mbox{def}}}{=}}
 %\newcommand{\namedmap}[1]{\stackrel{\mathclap{\mbox{\small#1}}}{\longmapsto}}
 
@@ -65,7 +67,7 @@
 %\newcommand{\citetodo}{\sidenote{\todo{[Citation Needed]}}\@\xspace}
 %\newcommand{\reftodo}{\sidenote{\todo{[Reference Needed]}}\@\xspace}
 %\newcommand{\prooftodo}{\sidenote{\todo{[Substantiation Needed]}}\@\xspace}
-%\newcommand{\todo}[1]{{\noindent\textcolor{Red}{\textit{\quad#1}}\par}}
+\newcommand{\todo}[1]{{\noindent\textcolor{Red}{\textit{\quad#1}}\par}}
 
 %%  Service description table
 %
@@ -251,6 +253,8 @@ tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
 \section{Related Works}%
 \label{sec:related_works}
 
+\todo{Add more related works}
+
 Whilst many escutcheons have been drawn and uploaded to WikiMedia in SVG format (some of which have
 been used in this report), many appear to have been created in
 Inkscape~\footnoteurl{https://inkscape.org/en/}, rather than being created programmatically.
@@ -271,8 +275,113 @@ the project. Core heraldry terminology includes:
   \item \textit{Tincture} --- the colours and patterns for charges, ordinaries and fields.
 \end{itemize}
 
+\chapter{Design}%
+\label{cha:design}
+
+\section{Core Concepts}%
+\label{sec:core_concepts}
+
+The core design for this project centred around having a split stack; with a Python back-end
+parsing the blazon, serialising it into JSON and passing it to the TypeScript front-end, which
+would then draw it onto the webpage. This allowed for large amounts of flexibility, allowing the
+two halves of the project to be developed in tandem with the Separation of Concerns principle being
+adhered to throughout. It also allows for pluggable rendering implementations as the JSON schema
+for drawing payloads can be well-defined. Python seemed like an obvious choice with its good
+support for Natural Language Processing (NLP) through the Natural Language Tool Kit (NLTK).
+TypeScript was chosen as a nicer alternative to programming in pure JavaScript, thanks to the
+addition of powerful features such as types, access control and abstract classes.
+
+The Python back-end would receive a JSON payload from the webpage containing the blazon; it would
+then parse the blazon using a Context-Free Grammar (CFG) parser and identify the most important
+parts of the blazon. It would then serialise these back into a JSON response to be sent to the
+webpage for rendering. The specification was such that if the webpage was given a blazon of
+``Azure, a bend Or'', it would return a JSON payload of:
+
+\begin{verbatim}
+{
+  "field": "azure",
+  "charges": [
+    {
+      "charge": "bend",
+      "tincture": "or"
+    }
+  ]
+}
+\end{verbatim}
+
+The TypeScript front-end would receive this payload, apply the \textit{azure} CSS class to the
+field element, then draw a bend onto the field with an \textit{or} CSS class.
+
+Escutcheons would be drawn using the SVG format for portability across browsers as well as the
+defined scalability of SVG images. This allows drawn escutcheons to be embedded elsewhere with
+ease, either directly or through rendering the SVGs as other image formats via programmes like
+Inkscape.
+
+The back-end was written by my partner, Anthony Gallagher, and the writing of it will not be
+covered in this report.
+
+\section{External Dependencies}%
+\label{sec:external_dependencies}
+
+The front-end would depend on a pair of libraries for Scalable Vector
+Graphics\footnoteurl{https://www.w3.org/TR/SVG11} (SVG) rendering and Document Object
+Model\footnoteurl{https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model} (DOM)
+manipulation: the selection library of D3.js\footnoteurl{https://github.com/d3/d3-selection} and
+jQuery\footnoteurl{https://jquery.com}. D3.js provides many powerful functions for SVG and DOM
+manipulation, especially creating and editing elements. It would also rely on jQuery for further
+DOM manipulation.
+
+For further assets, SASS\footnoteurl{https://sass-lang.com} would be used as a CSS pre-processor
+and Bootswatch\footnoteurl{https://bootswatch.com/flatly} would be used for the base styling.
+Webpack\footnoteurl{https://webpack.js.org} would be used to transpile TypeScript down to
+JavaScript --- minifying and uglifying it in the process --- and concatenates all source files and
+their dependencies into one main JavaScript \textit{bundle} file. \textit{Minification} of
+JavaScript assets involves stripping out all unnecessary whitespace and tokens.
+\textit{Uglification} transforms the JavaScript code by renaming all variables and functions into
+short, obfuscated names to reduce the footprint of the assets. These two techniques can decrease
+loading times of web apps as the browser have smaller asset payloads to download than the original,
+raw source code.
+
+\subsection{Development Dependencies}%
+\label{sub:development_dependencies}
+
+To maintain code readability and prevent bugs,
+TSLint\footnoteurl{https://palantir.github.io/tslint/} would be used and set up to automatically
+run as part of the Travis\footnoteurl{https://travis-ci.com/} Continuous Integration (CI) service,
+causing a build to fail if the linter detected a style violation. For unit testing,
+Jest\footnoteurl{https://facebook.github.io/jest/} (with
+ts-jest\footnoteurl{https://github.com/kulshekhar/ts-jest} for TypeScript support) would be used,
+especially for its powerful mocking and expectation matcher functionality. Automated documentation
+generation would be provided by TypeDoc\footnoteurl{http://typedoc.org/}.
+
 \section{Initial Design}%
 \label{sec:initial_design}
+
+The initial design had a specific focus on basic charge drawing, with a plan to produce a new
+design for adding quarterly rendering with lessons learnt from implementing charge drawing. The
+later design is described in Section~\ref{sec:adding_quarterly_rendering}.
+
+All drawing logic would be client-side, existing in a single module with minimum dependencies. The
+shield outline would be rendered on the page on load as part of the HTML template. This helps
+support a reliable entry point for the drawing logic as it can easily select the shield element to
+begin appending other SVG elements to. Appending these SVG elements allows layering to be achieved
+as SVG orders layers based on the order of elements in the document. This would be used to great
+effect later when drawing quarters (see Section~\ref{sec:adding_quarterly_rendering}).
+
+The front-end would be designed around functional paradigms; breaking up major functionality into
+functions that would deal with smaller, encapsulated functionality, such as adding extra layers to
+the HTML template or clearing the shield when drawing a new blazon. This would allow for a steady
+API, as the single point of access function would not be renamed but all other functions may be
+changed and updated separately. As described in Section~\ref{sec:core_concepts}, the front-end
+would first access the \textit{field} value in the parsed JSON payload, apply the value as the CSS
+class for the shield and then move onto the charges. It would then iterate over the
+\textit{charges} array in the payload, drawing each charge onto the shield and applying the
+tincture as the CSS class. Due to SVG layering, as mentioned earlier, if there were multiple
+charges specified in the payload, all would be drawn on in the order specified in the array
+ordering.
+
+\chapter{Implementation}%
+\label{cha:implementation}
 
 \section{Initial Approach}%
 \label{sec:initial_approach}
