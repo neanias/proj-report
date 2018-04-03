@@ -256,10 +256,9 @@ tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
 \todo{Add more related works}
 
 Whilst many escutcheons have been drawn and uploaded to WikiMedia in SVG format (some of which have
-been used in this report), many appear to have been created in
-Inkscape~\footnoteurl{https://inkscape.org/en/}, rather than being created programmatically.
-Much work has been done in collecting and cataloguing blazons themselves --- namely John Papworth
-as mentioned in Section~\ref{sec:motivation}.
+been used in this report), many appear to have been created in Inkscape~\autocite{inkscape}, rather
+than being created programmatically.  Much work has been done in collecting and cataloguing blazons
+themselves --- namely John Papworth as mentioned in Section~\ref{sec:motivation}.
 
 \section{Summary}%
 \label{sec:background_summary}
@@ -324,35 +323,31 @@ covered in this report.
 \label{sec:external_dependencies}
 
 The front-end would depend on a pair of libraries for Scalable Vector
-Graphics\footnoteurl{https://www.w3.org/TR/SVG11} (SVG) rendering and Document Object
-Model\footnoteurl{https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model} (DOM)
-manipulation: the selection library of D3.js\footnoteurl{https://github.com/d3/d3-selection} and
-jQuery\footnoteurl{https://jquery.com}. D3.js provides many powerful functions for SVG and DOM
-manipulation, especially creating and editing elements. It would also rely on jQuery for further
-DOM manipulation.
+Graphics~\autocite{ferraiolo2000scalable} (SVG) rendering and Document Object
+Model~\autocite{wood2004document} (DOM) manipulation: the selection library of
+D3.js~\autocite{d3js} and jQuery~\autocite{jquery}. D3.js provides many powerful functions for SVG
+and DOM manipulation, especially creating and editing elements. It would also rely on jQuery for
+further DOM manipulation.
 
-For further assets, SASS\footnoteurl{https://sass-lang.com} would be used as a CSS pre-processor
-and Bootswatch\footnoteurl{https://bootswatch.com/flatly} would be used for the base styling.
-Webpack\footnoteurl{https://webpack.js.org} would be used to transpile TypeScript down to
-JavaScript --- minifying and uglifying it in the process --- and concatenates all source files and
-their dependencies into one main JavaScript \textit{bundle} file. \textit{Minification} of
-JavaScript assets involves stripping out all unnecessary whitespace and tokens.
-\textit{Uglification} transforms the JavaScript code by renaming all variables and functions into
-short, obfuscated names to reduce the footprint of the assets. These two techniques can decrease
-loading times of web apps as the browser have smaller asset payloads to download than the original,
-raw source code.
+For further assets, SASS~\autocite{sass-lang} would be used as a CSS pre-processor and
+Bootswatch~\autocite{bootswatch-flatly} would be used for the base styling.
+Webpack~\autocite{webpack} would be used to transpile TypeScript down to JavaScript --- minifying
+and uglifying it in the process --- and concatenates all source files and their dependencies into
+one main JavaScript \textit{bundle} file. \textit{Minification} of JavaScript assets involves
+stripping out all unnecessary whitespace and tokens.  \textit{Uglification} transforms the
+JavaScript code by renaming all variables and functions into short, obfuscated names to reduce the
+footprint of the assets. These two techniques can decrease loading times of web apps as the browser
+have smaller asset payloads to download than the original, raw source code.
 
 \subsection{Development Dependencies}%
 \label{sub:development_dependencies}
 
-To maintain code readability and prevent bugs,
-TSLint\footnoteurl{https://palantir.github.io/tslint/} would be used and set up to automatically
-run as part of the Travis\footnoteurl{https://travis-ci.com/} Continuous Integration (CI) service,
+To maintain code readability and prevent bugs, TSLint~\autocite{tslint} would be used and set up to
+automatically run as part of the Travis Continuous Integration~\autocite{travis} (CI) service,
 causing a build to fail if the linter detected a style violation. For unit testing,
-Jest\footnoteurl{https://facebook.github.io/jest/} (with
-ts-jest\footnoteurl{https://github.com/kulshekhar/ts-jest} for TypeScript support) would be used,
+Jest~\autocite{jest} (with ts-jest~\autocite{ts-jest} for TypeScript support) would be used,
 especially for its powerful mocking and expectation matcher functionality. Automated documentation
-generation would be provided by TypeDoc\footnoteurl{http://typedoc.org/}.
+generation would be provided by TypeDoc~\autocite{typedoc}.
 
 \section{Initial Design}%
 \label{sec:initial_design}
