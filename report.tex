@@ -381,6 +381,38 @@ ordering.
 \section{Initial Approach}%
 \label{sec:initial_approach}
 
+As described in Section~\ref{sec:initial_design}, the initial approach was to have all methods in
+the core \texttt{index.ts} file that would be transpiled and loaded in the browser. This meant a
+smaller footprint when the code was bundled by Webpack and easier maintenance as all relevant
+functions were next to one another, following the Step-Down Rule~\autocite{martin2009clean}.
+
+The web app had a single entry point of \texttt{drawShield(blazon)}, where \texttt{blazon} was the
+whole JSON payload returned from the \texttt{/\_parse} endpoint. (See
+Section~\ref{sec:core_concepts} for an example payload.) This presented a problem initially as
+TypeScript didn't handle the unstructured parsed data well due to it being a JavaScript
+\texttt{Object} instance. Attempting to access members of this object (such as \texttt{field})
+causes TypeScript to produce an error that the contents might be undefined and thus return a
+\texttt{null} object. To fix this, I designed \texttt{interface}s with the expected fields in the
+payload; one for the whole object, \texttt{IBlazon}, and one for the charges contained within,
+\texttt{ICharge}. Similarly, to avoid problems with strings not matching, I defined 2
+\texttt{enum}s to represent the supported tinctures and charges, \texttt{ETincture} and
+\texttt{ECharge} respectively. As discussed in Section~\ref{sec:adding_quarterly_rendering}, I
+later added another \texttt{enum} for quarters. (All \texttt{interface}s and \texttt{enum}s can be
+found in Appendix~\ref{cha:interfaces_and_enums}.) Having fixed this data problem,
+\texttt{drawShield(blazon)} was now able to access members of the blazon object safely.
+
+To avoid the problem of overlapping charges, I had to write a \texttt{clearShield()} method that
+would iterate over all the \texttt{path} nodes in the SVG block, and delete them. This, however,
+promptly deleted the shield outline, so I had to add a check to prevent deleting \texttt{path}
+nodes with a \texttt{\#shield} id, instead only removing the CSS class. Having cleared the shield
+of any possible obstructions, the \texttt{drawShield} method would then assign the contents of the
+\texttt{field} value as the CSS class and iterate over the \texttt{charges} array, passing each
+charge to \texttt{drawCharge(charge: ICharge)}.
+
+To draw shapes in SVG, a \texttt{path} node requires a \texttt{d} attributes which contains the
+commands for drawing said shape. To generate all these attributes, I drew all the charge shapes in
+Inkscape and extracted the \texttt{d} attribute from the generated SVGs.
+
 \section{Adding Quarterly Rendering}%
 \label{sec:adding_quarterly_rendering}
 
@@ -410,5 +442,59 @@ ordering.
 \backmatter
 
 \printbibliography[heading=bibintoc]
+
+\appendix
+\setboolean{@mainmatter}{true}
+
+\chapter{Interfaces and Enums}%
+\label{cha:interfaces_and_enums}
+
+\begin{verbatim}
+enum ETincture {
+  /** For specifying Quarters */
+  Quarterly = "quarterly",
+  /** Gold/yellow */
+  Or = "or",
+  /** White */
+  Argent = "argent",
+  /** Blue */
+  Azure = "azure",
+  /** Red */
+  Gules = "gules",
+  /** Purple */
+  Purpure = "purpure",
+  /** Black */
+  Sable = "sable",
+  /** Green */
+  Vert = "vert",
+}
+
+enum ECharge {
+  Bend = "bend",
+  Cross = "cross",
+  Chief = "chief",
+  Saltire = "saltire",
+}
+
+enum EQuarter {
+  TL = "quarterly_tl",
+  TR = "quarterly_tr",
+  BL = "quarterly_bl",
+  BR = "quarterly_br",
+}
+
+interface ICharge {
+  charge: ECharge;
+  sinister?: boolean;
+  tincture?: ETincture;
+}
+
+interface IBlazon {
+  field: ETincture;
+  charges: ICharge[];
+}
+\end{verbatim}
+
+\setboolean{@mainmatter}{false}
 
 \end{document}
