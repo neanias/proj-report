@@ -76,20 +76,20 @@
 %\newcommand{\prooftodo}{\sidenote{\todo{[Substantiation Needed]}}\@\xspace}
 \newcommand{\todo}[1]{{\noindent\textcolor{Red}{\textit{\quad#1}}\par}}
 
-\let\lines\baselineskip
+\let\lines\baselineskip{}
 
 \usepackage{glossaries}
 \setacronymstyle{long-short}
 
 \loadglsentries{glossary}
 
-\glstoctrue
+\glstoctrue{}
 
 \begin{document}
 
 \frontmatter
 
-\maketitlepage
+\maketitlepage{}
 
 %\abstract{This is an example of {\tt infthesis} style. The file {\tt
 %skeleton.tex} generates this document and can be used to get a ``skeleton''
@@ -102,9 +102,10 @@
 
 \begin{publicationmeta}
   \section*{Acknowledgements}
-  % TODO: Think of people to acknowledge
-  % I'd like to acknowledge Jesus for swapping bottles whilst I was drinking them. It was really
-  % difficult to find him at the bottom, so I had to keep drinking.
+  I would like to thank my supervisor, Julian Bradfield, for his help and advice as I was writing
+  this project. I would also like to thank all my friends on Level 9 of Appleton Tower who helped
+  keep me going through the long, arduous journey that was this project and 4\textsuperscript{th}
+  year as a whole.
 
   \section*{Declaration}
   I declare that this thesis was composed by myself,
@@ -112,14 +113,14 @@
   except where explicitly stated otherwise in the text,
   and that this work has not been submitted for any other degree or
   professional qualification except as specified.\par
-  ({\textit \thanklessauthor})
+  ({\textit{\thanklessauthor}})
 \end{publicationmeta}
 
 \tableofcontents
 
 %\pagenumbering{Arabic}
 
-\mainmatter
+\mainmatter{}
 
 \chapter{Introduction}\label{cha:introduction}
 
