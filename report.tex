@@ -380,12 +380,23 @@ ts-jest~\autocite{ts-jest} for TypeScript support) was used, especially for its 
 and expectation matcher functionality. Automated documentation generation was provided by
 TypeDoc~\autocite{typedoc}.
 
-\section{Initial Design}%
-\label{sec:initial_design}
+\section{Iterative Design}%
+\label{sec:iterative_design}
 
-The initial design had a specific focus on basic \charge{} drawing, with a plan to produce a new
-design for adding quarterly rendering with lessons learnt from implementing \charge{} drawing. The
-later design is described in Section~\ref{sub:replanning_to_refactor}.
+Iterative design was used as the design process for writing the code for this project. Iterative
+design is a cyclical process of designing, prototyping and evaluating. One designs and prototypes a
+new feature before evaluating the final feature design. If the design is acceptable, the new
+feature is implemented, otherwise the cycle restarts. An iterative design process allows to address
+different functionality as separate tasks, building on top of one another. It also allows to
+heavily refactor a project whilst staying in one cycle.
+
+\subsection{First Iteration}%
+\label{sub:first_iteration}
+
+The first design iteration had a specific focus on basic \charge{} drawing, with a plan to begin a
+second iteration for adding quarterly rendering with lessons learnt from implementing \charge{}
+drawing in the first iteration. The second design iteration is described in
+Section~\ref{sub:second_design_iteration}.
 
 I decided to have all drawing logic defined in the client, existing in a single module with minimum
 dependencies. The shield outline was rendered on the page on load as part of the HTML template.
@@ -393,7 +404,7 @@ This helped support a reliable entry point for the drawing logic as it was able 
 the shield element to begin appending other \svg{} elements to. Appending these \svg{} elements
 allowed layering to be achieved as \svg{} orders layers based on the order of elements in the
 document. This was used to great effect later when drawing quarters (see
-Section~\ref{sub:replanning_to_refactor}).
+Section~\ref{sub:second_design_iteration}).
 
 The front-end was designed around functional paradigms; breaking up major functionality into
 functions that would deal with smaller, encapsulated functionality, such as adding extra layers to
@@ -412,7 +423,7 @@ payload, all would be drawn according to the array ordering.
 \section{Initial Approach}%
 \label{sec:initial_approach}
 
-As described in Section~\ref{sec:initial_design}, the initial approach was to have all methods in
+As described in Section~\ref{sub:first_iteration}, the initial approach was to have all methods in
 the core \texttt{index.ts} file that would be \gls{transpile}d and loaded in the browser. This
 meant a smaller footprint when the code was bundled by Webpack and easier maintenance as all
 relevant functions were next to one another, following the Step-Down
@@ -422,10 +433,10 @@ calls function \texttt{B()} and \texttt{C()} in its function body, functions \te
 
 The web app had a single entry point of \texttt{drawShield(blazon)}, where \texttt{blazon} was the
 whole JSON payload returned from the \texttt{/\_parse} endpoint. (See
-Section~\ref{sec:core_concepts} for an example payload.) This presented a problem initially as
+Figure~\ref{fig:expected_output} for an example payload.) This presented a problem initially as
 TypeScript didn't handle the unstructured parsed data well due to it being a JavaScript
-\texttt{Object}\footnote{In JavaScript, an \texttt{Object} works as both an associative array and
-a basis for classes and inheritance through its \texttt{prototype} field.} instance. Attempting to
+\texttt{Object}\footnote{In JavaScript, an \texttt{Object} works as both an associative array and a
+basis for classes and inheritance through its \texttt{prototype} field.} instance. Attempting to
 access members of this object (such as \texttt{field}) causes TypeScript to produce an error that
 the contents might be undefined and thus return a \texttt{null} object. To fix this, I designed
 \texttt{interface}s with the expected fields in the payload; one for the whole object,
