@@ -189,11 +189,11 @@ difficulty in parsing the blazons as the language loses some of its regularity.
 Blazons have a few key attributes:
 \begin{itemize}
   \item The \textit{\gls{field}}, which is the background colour of the shield or quarter;
-  \item \textit{Ordinaries}, which are geometric shapes (an example of which can be seen in
-    Figure~\ref{fig:scrope}, bearing a golden slash, or \textit{bend});
+  \item \textit{Ordinaries}, which are geometric shapes (as seen in Figure~\ref{fig:scrope},
+    bearing a golden slash, or \textit{bend});
   \item \textit{\Glspl{charge}}, which are small emblems, such as fleur-de-lis and lions;
   \item \textit{\Glspl{variation}}, which describe how the field or \charge{} is patterned.
-    \Glspl{variation} can indicate patterns such as chequered or coloured lines (an example can be seen in
+    \Glspl{variation} can indicate patterns such as chequered or coloured lines (as seen in
     Figure~\ref{fig:blason_albert}); and
   \item \textit{\Glspl{tincture}}, which are the colours and patterns for \charges{}, ordinaries
     and fields.
@@ -276,7 +276,7 @@ tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
 Whilst many escutcheons have been drawn and uploaded to WikiMedia in
 \svg~\autocite{ferraiolo2000scalable} format (some of which have been used in this report), many
 appear to have been created in Inkscape~\autocite{inkscape}, rather than being created
-programmatically.  Much work has been done in collecting and cataloguing blazons themselves ---
+programmatically. Much work has been done in collecting and cataloguing blazons themselves ---
 namely John Papworth as mentioned in Section~\ref{sec:motivation}.
 
 \section{Summary}%
@@ -385,7 +385,7 @@ TypeDoc~\autocite{typedoc}.
 
 The initial design had a specific focus on basic \charge{} drawing, with a plan to produce a new
 design for adding quarterly rendering with lessons learnt from implementing \charge{} drawing. The
-later design is described in Section~\ref{sec:adding_quarterly_rendering}.
+later design is described in Section~\ref{sub:replanning_to_refactor}.
 
 I decided to have all drawing logic defined in the client, existing in a single module with minimum
 dependencies. The shield outline was rendered on the page on load as part of the HTML template.
@@ -393,7 +393,7 @@ This helped support a reliable entry point for the drawing logic as it was able 
 the shield element to begin appending other \svg{} elements to. Appending these \svg{} elements
 allowed layering to be achieved as \svg{} orders layers based on the order of elements in the
 document. This was used to great effect later when drawing quarters (see
-Section~\ref{sec:adding_quarterly_rendering}).
+Section~\ref{sub:replanning_to_refactor}).
 
 The front-end was designed around functional paradigms; breaking up major functionality into
 functions that would deal with smaller, encapsulated functionality, such as adding extra layers to
@@ -416,23 +416,25 @@ As described in Section~\ref{sec:initial_design}, the initial approach was to ha
 the core \texttt{index.ts} file that would be \gls{transpile}d and loaded in the browser. This
 meant a smaller footprint when the code was bundled by Webpack and easier maintenance as all
 relevant functions were next to one another, following the Step-Down
-Rule~\autocite{martin2009clean}. \marginnote{The Step-Down Rule dictates that if function
-\texttt{A()} calls function \texttt{B()} and \texttt{C()} in its function body, functions
-\texttt{A()} and \texttt{B()} should be defined immediately after function \texttt{A()}.}
+Rule~\autocite{martin2009clean}\footnote{The Step-Down Rule dictates that if function \texttt{A()}
+calls function \texttt{B()} and \texttt{C()} in its function body, functions \texttt{A()} and
+\texttt{B()} should be defined immediately after function \texttt{A()}.}.
 
 The web app had a single entry point of \texttt{drawShield(blazon)}, where \texttt{blazon} was the
 whole JSON payload returned from the \texttt{/\_parse} endpoint. (See
 Section~\ref{sec:core_concepts} for an example payload.) This presented a problem initially as
 TypeScript didn't handle the unstructured parsed data well due to it being a JavaScript
-\texttt{Object} instance. Attempting to access members of this object (such as \texttt{field})
-causes TypeScript to produce an error that the contents might be undefined and thus return a
-\texttt{null} object. To fix this, I designed \texttt{interface}s with the expected fields in the
-payload; one for the whole object, \texttt{IBlazon}, and one for the \charges{} array contained
-within, \texttt{ICharge}. Similarly, to avoid problems with string matching, I defined 2
-\texttt{enum}s to represent the supported tinctures and \charges{}, \texttt{ETincture} and
-\texttt{ECharge} respectively. As discussed in Section~\ref{sec:adding_quarterly_rendering}, I
-later added another \texttt{enum} for quarters. (All \texttt{interface}s and \texttt{enum}s can be
-found in Appendix~\ref{cha:interfaces_and_enums}.) Having fixed this data problem,
+\texttt{Object}\footnote{In JavaScript, an \texttt{Object} works as both an associative array and
+a basis for classes and inheritance through its \texttt{prototype} field.} instance. Attempting to
+access members of this object (such as \texttt{field}) causes TypeScript to produce an error that
+the contents might be undefined and thus return a \texttt{null} object. To fix this, I designed
+\texttt{interface}s with the expected fields in the payload; one for the whole object,
+\texttt{IBlazon}, and one for the \charges{} array contained within, \texttt{ICharge}. Similarly,
+to avoid problems with string matching, I defined 2 \texttt{enum}s to represent the supported
+tinctures and \charges{}, \texttt{ETincture} and \texttt{ECharge} respectively. As discussed in
+Section~\ref{sec:adding_quarterly_rendering}, I later added another \texttt{enum} for quarters.
+(All \texttt{interface}s and \texttt{enum}s can be found in
+Appendix~\ref{cha:interfaces_and_enums}.) Having fixed this data problem,
 \texttt{drawShield(blazon)} was now able to access members of the blazon object safely.
 
 To avoid the problem of overlapping \charges{}, I had to write a \texttt{clearShield()} method that
@@ -450,20 +452,21 @@ with the hope that the range is large enough to lack overlaps.
 To draw shapes in \svg{}, a \texttt{path} node requires a `\texttt{d}' attributes which contains
 the commands for drawing said shape. To generate all these attributes, I drew all the \charge{}
 shapes in Inkscape and extracted the `\texttt{d}' attribute from the generated \svgs{}. At first, I
-put a Map\footnote{A Map here is a TypeScript/JavaScript data type, also known as an associative
-array} of the \charges{} and their paths in the global scope, available for all functions to
-access. This worked for \charges{} that were produced using a \texttt{path} node with a
-`\texttt{d}' attribute, but introduced problems when using the \textit{chief} \charge{} (a chief
-\charge{} being displayed in Figure~\ref{fig:chief_example}). The chief \charge{} was drawn using a
-\texttt{rect} node which required `\texttt{x}' and `\texttt{y}' co-ordinates to specify a starting
-point and \texttt{height} and \texttt{width} attributes to describe the size of the rectangle. To
-address this, I wrote a \texttt{ChargeShapes} class to encapsulate the \charges{} and their
-attributes. This class provided one public member, \texttt{chargePaths} which was of the type
-\texttt{Map<string, Map<string, string>\hphantom{}>}. Having this as a map allowed
-\texttt{drawCharge} to first check if the app knew how to draw the \charge{} by checking whether
-\texttt{ChargeShapes.chargePaths} contained the \charge{} as a key. If the \charge{} had an entry,
-then \texttt{drawCharge} would iterate over the attribute Map and apply them to the \texttt{path}
-or \texttt{rect} node, before finally applying the CSS class.
+put a \texttt{Map}\footnote{A \texttt{Map} here is a TypeScript/JavaScript data type, also known as
+a \texttt{HashMap} or an associative array} of the \charges{} and their paths in the global scope,
+available for all functions to access. This worked for \charges{} that were produced using a
+\texttt{path} node with a `\texttt{d}' attribute, but introduced problems when using the
+\textit{chief} \charge{} (a chief \charge{} being displayed in Figure~\ref{fig:chief_example}). The
+chief \charge{} was drawn using a \texttt{rect} node which required `\texttt{x}' and `\texttt{y}'
+co-ordinates to specify a starting point and \texttt{height} and \texttt{width} attributes to
+describe the size of the rectangle. To address this, I wrote a \texttt{ChargeShapes} class to
+encapsulate the \charges{} and their attributes. This class provided one public member,
+\texttt{chargePaths} which was of the type \texttt{Map<string, Map<string, string>\hphantom{}>}.
+Having this as a map allowed \texttt{drawCharge} to first check if the app knew how to draw the
+\charge{} by checking whether \texttt{ChargeShapes.chargePaths} contained the \charge{} as a key.
+If the \charge{} had an entry, then \texttt{drawCharge} would iterate over the attribute
+\texttt{Map} and apply them to the \texttt{path} or \texttt{rect} node, before finally applying the
+CSS class.
 
 \begin{marginfigure}
   \centering
@@ -478,8 +481,43 @@ This writes to an attribute \texttt{transform} which applies a \texttt{matrix} t
 flips the \charge{} followed by a \texttt{translate} transformation to move it into place. An
 example of a sinister bend can be seen in Figure~\ref{fig:sinister_example}.
 
+Whilst this simple implementation worked well for drawing basic \glspl{escutcheon}, like
+Figure~\ref{fig:chief_example} and Figure~\ref{fig:sinister_example}, it wasn't able to draw more
+complex shields like those seen in Figure~\ref{fig:complex_shields}.
+
 \section{Adding Quarterly Rendering}%
 \label{sec:adding_quarterly_rendering}
+
+\subsection{Replanning to Refactor}%
+\label{sub:replanning_to_refactor}
+
+Whilst prototyping for adding functionality to render quarterly shields, I found that it was going
+to be impossible to maintain the initial, atomic design laid out in
+Section~\ref{sec:initial_design} whilst also keeping the code clean and readable. To counter this,
+I designed a new, modular system that leaned more heavily into Object-Oriented paradigms than
+functional ones. All major sections of functionality, including \gls{blazon} parsing, \charge{} and
+quarter rendering, were encapsulated in their own class with clear names and well-defined, shared
+APIs. This new design was written to follow the SOLID~\autocite{martin2000design} object-oriented
+design principles where possible.
+
+\subsection{SOLID Design Principles}%
+\label{sub:solid_design_principles}
+
+\todo{Refactor all this, see photos, break principles into relevant sections.}
+
+SOLID object-oriented design is a collection of 5 design principles:
+
+\begin{itemize}
+  \item \textit{The Single Responsibility Principle} --- a class should have one, and only one,
+    reason to change;
+  \item \textit{The Open Closed Principle} --- you should be able to extend a class's behaviour,
+    without modifying it;
+  \item \textit{The Liskov Substitution Principle} --- derived classes must be substituable for
+    their base classes;
+  \item \textit{The Interface Segregation Principle} --- make fine grained interfaces that are
+    client specific and
+  \item \textit{The Dependency Inversion Principle} --- depend on abstractions, not on concretions.
+\end{itemize}
 
 \section{Refactoring Charge Rendering}%
 \label{sec:refactoring_charge_rendering}
