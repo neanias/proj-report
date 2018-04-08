@@ -8,7 +8,7 @@
 \usepackage{csquotes}
 \usepackage[style=verbose, autocite=footnote, backend=biber]{biblatex}
 
-\title{Displaying Heraldic Blazons}
+\title{Displaying Heraldic\\Blazons}
 \author{William Mathewson}
 \publisher{University of Edinburgh}
 \date{January 2018}
@@ -61,6 +61,13 @@
 \newcommand{\charges}{\glspl{charge}\@\xspace}
 \newcommand{\tincture}{\gls{tincture}\@\xspace}
 \newcommand{\tinctures}{\glspl{tincture}\@\xspace}
+\newcommand{\quarter}{\gls{quarter}\@\xspace}
+\newcommand{\quarters}{\glspl{quarter}\@\xspace}
+
+\newcommand{\blazon}{\gls{blazon}\@\xspace}
+\newcommand{\blazons}{\glspl{blazon}\@\xspace}
+\newcommand{\ublazon}{\Gls{blazon}\@\xspace}
+\newcommand{\ublazons}{\Glspl{blazon}\@\xspace}
 
 %\newcommand{\defeq}{\stackrel{\mathclap{\normalfont\mbox{def}}}{=}}
 %\newcommand{\namedmap}[1]{\stackrel{\mathclap{\mbox{\small#1}}}{\longmapsto}}
@@ -128,7 +135,7 @@
 \chapter{Introduction}\label{cha:introduction}
 
 This project was written as a paired project and as such I only wrote the side of the project that
-deals with rendering the \glspl{blazon}, having been parsed by the back end. The back-end was
+deals with rendering the \blazons{}, having been parsed by the back end. The back-end was
 written by my partner, Anthony Gallagher, and the writing of it will not be covered in this report.
 Important shared design elements will be covered however in Section~\ref{sec:core_concepts}.
 
@@ -138,19 +145,19 @@ In 1874 --- 4 years after his death --- John Papworth's \textit{Ordinary of Brit
 published~\autocite{collins_1942}. In this work, he recorded approximately 50,000 entries of
 descriptions of families' coats of arms, none annotated.
 
-This honours project would make it possible to have these descriptions, or \textit{\glspl{blazon}}
-as they are termed in heraldry (see~\ref{sec:heraldry}), drawn freely for people to view. This has
-potential application for ancestry companies that build family trees for people. Given the blazon,
-they would be able to construct the shields visually.
+This honours project would make it possible to have these descriptions, or \textit{\blazons{}} as
+they are termed in heraldry (see~\ref{sec:heraldry}), drawn freely for people to view. This has
+potential application for ancestry companies that build family trees for people. Given the
+\blazon{}, they would be able to construct the shields visually.
 
 \section{Contributions}\label{sec:contributions}
 
 In this honours project, my contributions included:
 
 \begin{itemize}
-  \item Drawing the \charges{} and quarters used on the shield, or \textit{\gls{escutcheon}},
+  \item Drawing the \charges{} and \quarters{} used on the shield, or \textit{\gls{escutcheon}},
   \item Writing the base web server and
-  \item Writing the quarter and \charge{} drawing algorithm
+  \item Writing the \quarter{} and \charge{} drawing algorithm
 \end{itemize}
 
 \chapter{Background}\label{cha:background}
@@ -173,13 +180,13 @@ would recommend to you the many heraldic works of Charles Boutell and John Brook
   \label{fig:royal_coa}
 \end{marginfigure}
 
-At the centre of a coat of arms is a shield known as an \textit{escutcheon}. The language used to
-describe how the escutcheon is to be drawn is known as a \textit{blazon}. Blazons have been used
-since the Norman conquest and have been refined to a regular language in the
-process~\autocite{boutell_1864}, although, as John Brooke-Little said, ``many of the supposedly
-hard and fast rules laid down in heraldic manuals [including those by heralds] are often
+At the centre of a coat of arms is a shield known as an \textit{\gls{escutcheon}}. The language
+used to describe how the escutcheon is to be drawn is known as a \textit{\blazon}.
+\ublazons have been used since the Norman conquest and have been refined to a regular language
+in the process~\autocite{boutell_1864}, although, as John Brooke-Little said, ``many of the
+supposedly hard and fast rules laid down in heraldic manuals [including those by heralds] are often
 ignored.''~\autocite{brooke_little_1985} This flagrant disregard for the rules introduces
-difficulty in parsing the blazons as the language loses some of its regularity.
+difficulty in parsing the \blazons as the language loses some of its regularity.
 
 \begin{marginfigure}
   \centering
@@ -189,10 +196,11 @@ difficulty in parsing the blazons as the language loses some of its regularity.
   gules}. Source:~\url{https://en.wikipedia.org/wiki/File:Blason_Albert.svg}}\label{fig:blason_albert}
 \end{marginfigure}
 
-Blazons have a few key attributes:
+\ublazons have a few key attributes:
 \begin{itemize}
-  \item The \textit{\gls{field}}, which is the background colour of the shield or quarter;
-  \item \textit{Ordinaries}, which are geometric shapes (as seen in Figure~\ref{fig:scrope},
+  \item The \textit{\gls{field}}, which is the background colour of the shield or
+    \quarter{};
+  \item \textit{\Glspl{ordinary}}, which are geometric shapes (as seen in Figure~\ref{fig:scrope},
     bearing a golden slash, or \textit{bend});
   \item \textit{\Glspl{charge}}, which are small emblems, such as fleur-de-lis and lions;
   \item \textit{\Glspl{variation}}, which describe how the field or \charge{} is patterned.
@@ -214,35 +222,38 @@ decide~\autocite{college_of_arms_faq}. In this case, I have used default CSS col
   \centering
   \def\svgwidth{0.8\linewidth}
   \input{graphics/chief_example.pdf_tex}
-  \caption{\textit{Purpure, a chief Gules}.}\label{fig:chief_example}
+  \caption{\textit{Purpure, a chief Gules}.}%
+  \label{fig:chief_example}
 \end{marginfigure}
 
-Blazons conventionally follow a form of starting with the \textit{tincture} or \textit{variation}
-of the field. After the description of the field, \textit{ordinaries} and \textit{\charges{}} are
-named with their tinctures. An example of this is ``\textit{Purpure, a chief Gules}''. This blazon
-describes an escutcheon with a field of \textit{purpure} (purple), with a \textit{Chief} ordinary
---- a bar across the top of the shield --- of \textit{gules} (red). This can be seen --- drawn by
-the web app --- in Figure~\ref{fig:chief_example}.
+\ublazons conventionally follow a form of starting with the \textit{\gls{tincture}} or
+\textit{\gls{variation}} of the field. After the description of the field,
+\textit{\glspl{ordinary}} and \textit{\charges{}} are named with their tinctures. An example of
+this is ``\textit{Purpure, a chief Gules}''. This \blazon describes an escutcheon with a field of
+\textit{purpure} (purple), with a \textit{Chief} \gls{ordinary} --- a bar across the top of the
+shield --- of \textit{gules} (red). This can be seen --- drawn by the web app --- in
+Figure~\ref{fig:chief_example}.
 
 \begin{marginfigure}
   \centering
   \def\svgwidth{0.8\linewidth}
   \input{graphics/scrope.pdf_tex}
-  \caption{The Scrope escutcheon; \textit{Azure, a bend Or}.}\label{fig:scrope}
+  \caption{The Scrope \gls{escutcheon}; \textit{Azure, a bend Or}.}%
+  \label{fig:scrope}
 \end{marginfigure}
 
-A simple --- but notable --- blazon is that of the Scrope family. In the 14th century, the Baron
-Scrope brought a case action against Sir Roberts Grosvenor when he noticed that they both had the
+A simple --- but notable --- \blazon is that of the Scrope family. In the 14th century, the Baron
+Scrope brought a case action against Sir Robert Grosvenor when he noticed that they both had the
 same coat of arms. Many witnesses gave evidence in the case, including Geoffrey
 Chaucer~\autocite{scrope_grosvenor}. The case was ultimately decided in Scrope's favour. The Scrope
-coat of arms has a blazon of \textit{Azure, a bend Or}; a depiction of this (as drawn by the web
+coat of arms has a \blazon of \textit{Azure, a bend Or}; a depiction of this (as drawn by the web
 app written for this project) can be seen in Figure~\ref{fig:scrope}.
 
 Whilst the Scrope arms are prominent in heraldry, they are simplistic and indicative of
 medi\ae{}val arms. Coats of arms became more complex as they developed through the centuries, with
 instances of \textit{quarterly} shields, \textit{grand-quarterlies} --- quarterlies within
 quarterlies --- and \textit{differenced} arms. \textit{Differenced} arms involve adding an
-\textit{ordinary} over an existing coat of arms. This was typically used to differentiate similar
+\textit{\gls{ordinary}} over an existing coat of arms. This was typically used to differentiate similar
 looking coats of arms, especially between father and sons. Common examples of differentiated
 shields are seen in duchies' coats of arms, particularly those which were given to Charles II's
 illegitimate children. Examples of more complex shields can be seen in
@@ -263,11 +274,11 @@ Figure~\ref{fig:complex_shields}.
   \caption{Some examples of more complex coats of arms.}\label{fig:complex_shields}
 \end{figure*}
 
-For a time, it was considered bad form to repeat a \textit{tincture} in a blazon, and use a
+For a time, it was considered bad form to repeat a \textit{tincture} in a \blazon, and use a
 reference to the tincture's previous use. The Heraldic Society gives an example as such:
 ``\textit{`Azure on a fess argent three billets azure'} [would have been written as] \textit{`Azure
 on a fess argent three billets of the first'}''. The `\textit{of the first}' refers to the field's
-tincture of azure. This blazon describes a blue shield, with a white bar horizontally across the
+tincture of azure. This \blazon describes a blue shield, with a white bar horizontally across the
 middle with 3 white rectangles arranged along the bar. The Heraldic Society advocates repeating
 tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
 
@@ -279,7 +290,7 @@ tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
 Whilst many escutcheons have been drawn and uploaded to WikiMedia in
 \svg~\autocite{ferraiolo2000scalable} format (some of which have been used in this report), many
 appear to have been created in Inkscape~\autocite{inkscape}, rather than being created
-programmatically. Much work has been done in collecting and cataloguing blazons themselves ---
+programmatically. Much work has been done in collecting and cataloguing \blazons themselves ---
 namely John Papworth as mentioned in Section~\ref{sec:motivation}.
 
 \section{Summary}%
@@ -312,7 +323,7 @@ TypeScript was chosen as a nicer alternative to programming in pure JavaScript, 
 addition of powerful features such as types, access control and abstract classes.
 
 The core design for this project centred around having a split stack; with a Python back-end
-parsing the blazon, serialising it into JSON \marginnote{\gls{json} is a lightweight
+parsing the \blazon, serialising it into JSON \marginnote{\gls{json} is a lightweight
   data-interchange format, consisting of key-value pairs, array data types and other serialisable
   data types (such as strings, numbers and booleans). JSON is derived from JavaScript's associative
 array-style data type, \texttt{Object}. An example of JSON can be seen in
@@ -322,13 +333,13 @@ project to be developed in tandem with the Separation of Concerns principle bein
 throughout. It also allows for pluggable rendering implementations as the JSON schema for drawing
 payloads can be well-defined.
 
-The Python back-end received a JSON payload from the webpage containing the blazon; it parsed the
-blazon using a Context-Free Grammar (CFG) parser and identified the most important parts of the
-blazon. It then serialised these back into a JSON response to be sent to the webpage for rendering.
-The specification was such that if the webpage was given a blazon of ``Azure, a bend Or'', it would
+The Python back-end received a JSON payload from the webpage containing the \blazon; it parsed the
+\blazon using a Context-Free Grammar (CFG) parser and identified the most important parts of the
+\blazon. It then serialised these back into a JSON response to be sent to the webpage for rendering.
+The specification was such that if the webpage was given a \blazon of ``Azure, a bend Or'', it would
 return the JSON payload seen in Figure~\ref{fig:expected_output}.
 
-\begin{figure}
+\begin{figure}[h]
   \begin{verbatim}
     {
       "field": "azure",
@@ -338,7 +349,7 @@ return the JSON payload seen in Figure~\ref{fig:expected_output}.
       }]
     }
   \end{verbatim}
-  \caption{Expected output from the Python back end, for a given blazon of ``Azure, a bend Or''.}%
+  \caption{Expected output from the Python back end, for a given \blazon of ``Azure, a bend Or''.}%
   \label{fig:expected_output}
 \end{figure}
 
@@ -357,13 +368,13 @@ The front-end depended on a pair of libraries for \svg{} rendering and \dom{} ma
 selection library of D3.js~\autocite{d3js} and jQuery~\autocite{jquery}. D3.js provides many
 powerful functions for \svg{} and \dom{} manipulation, especially creating and editing \svg{} and
 HTML elements. It would also rely on jQuery for further \dom{} manipulation. The Mozilla Developer
-Network defines the \dom{} as such: ``The Document Object Model (DOM) connects web pages to scripts
-or programming languages. Usually that means JavaScript, but modelling HTML, SVG, or XML documents
-as objects is not part of the JavaScript language. The DOM model represents a document with a
-logical tree. Each branch of the tree ends in a node, and each node contains objects. DOM methods
-allow programmatic access to the tree; with them you can change the document's structure, style or
-content. Nodes can have event handlers attached to them. Once an event is triggered, the event
-handlers get executed.''~\autocite{mdn_dom}.
+Network defines the \dom{} as such: ``The \glsentryfirst{dom} connects web pages to scripts or
+programming languages. Usually that means JavaScript, but modelling HTML, SVG, or XML documents as
+objects is not part of the JavaScript language. The \dom{} model represents a document with a
+logical tree. Each branch of the tree ends in a node, and each node contains objects.  \dom{}
+methods allow programmatic access to the tree; with them you can change the document's structure,
+style or content. Nodes can have event handlers attached to them. Once an event is triggered, the
+event handlers get executed.''~\autocite{mdn_dom}.
 
 For further assets, Sass~\autocite{sass-lang} was used as a CSS pre-processor and
 Bootswatch~\autocite{bootswatch-flatly} was used for the base styling.  Webpack~\autocite{webpack}
@@ -413,7 +424,7 @@ Section~\ref{sub:second_design_iteration}).
 
 The front-end was designed around functional paradigms; breaking up major functionality into
 functions that would deal with smaller, encapsulated functionality, such as adding extra layers to
-the HTML template or clearing the shield when drawing a new blazon. This allowed for a stable API,
+the HTML template or clearing the shield when drawing a new \blazon. This allowed for a stable API,
 as the single point of access function would not be renamed but all other functions may be changed
 and updated separately. As described in Section~\ref{sec:core_concepts}, the front-end first
 accessed the \textit{field} value in the parsed JSON payload, applied the value as the CSS class
@@ -436,22 +447,22 @@ Rule~\autocite{martin2009clean}\footnote{The Step-Down Rule dictates that if fun
 calls function \texttt{B()} and \texttt{C()} in its function body, functions \texttt{A()} and
 \texttt{B()} should be defined immediately after function \texttt{A()}.}.
 
-The web app had a single entry point of \texttt{drawShield(blazon)}, where \texttt{blazon} was the
+The web app had a single entry point of \texttt{drawShield(\blazon)}, where \texttt{\blazon} was the
 whole JSON payload returned from the \texttt{/\_parse} endpoint. (See
 Figure~\ref{fig:expected_output} for an example payload.) This presented a problem initially as
 TypeScript didn't handle the unstructured parsed data well due to it being a JavaScript
 \texttt{Object}\footnote{In JavaScript, an \texttt{Object} works as both an associative array and a
 basis for classes and inheritance through its \texttt{prototype} field.} instance. Attempting to
-access members of this object (such as \texttt{field}) causes TypeScript to produce an error that
-the contents might be undefined and thus return a \texttt{null} object. To fix this, I designed
-\texttt{interface}s with the expected fields in the payload; one for the whole object,
+access members of this object (such as \texttt{\gls{field}}) causes TypeScript to produce an error
+that the contents might be undefined and thus return a \texttt{null} object. To fix this, I
+designed \texttt{interface}s with the expected fields in the payload; one for the whole object,
 \texttt{IBlazon}, and one for the \charges{} array contained within, \texttt{ICharge}. Similarly,
 to avoid problems with string matching, I defined 2 \texttt{enum}s to represent the supported
 tinctures and \charges{}, \texttt{ETincture} and \texttt{ECharge} respectively. As discussed in
 Section~\ref{sec:adding_quarterly_rendering}, I later added another \texttt{enum} for quarters.
 (All \texttt{interface}s and \texttt{enum}s can be found in
 Appendix~\ref{cha:interfaces_and_enums}.) Having fixed this data problem,
-\texttt{drawShield(blazon)} was now able to access members of the blazon object safely.
+\texttt{drawShield(\blazon)} was now able to access members of the \blazon object safely.
 
 To avoid the problem of overlapping \charges{}, I had to write a \texttt{clearShield()} method that
 would iterate over all the \texttt{path} nodes in the \svg{} block, and delete them. This, however,
@@ -459,7 +470,7 @@ promptly deleted the shield outline, so I had to add a check to prevent deleting
 nodes with a \texttt{\#shield} id, instead only removing the CSS class. Having cleared the shield
 of any possible obstructions, the \texttt{drawShield} method would then assign the contents of the
 \texttt{field} value as the CSS class and iterate over the \texttt{\charges{}} array, passing each
-\charge{} to \texttt{drawCharge(charge: ICharge)}.
+\charge{} to \texttt{drawCharge(charge:~ICharge)}.
 
 When each \charge{} node is created in \texttt{drawCharge}, it is assigned an id. This id is formed
 from the name of the charge, followed by a random number in the range $1\text{--}512$ inclusive
@@ -504,22 +515,55 @@ complex shields like those seen in Figure~\ref{fig:complex_shields}.
 \section{Adding Quarterly Rendering}%
 \label{sec:adding_quarterly_rendering}
 
-\subsection{Replanning to Refactor}%
-\label{sub:replanning_to_refactor}
+\subsection{Second Design Iteration}%
+\label{sub:second_design_iteration}
 
 Whilst prototyping for adding functionality to render quarterly shields, I found that it was going
 to be impossible to maintain the initial, atomic design laid out in
-Section~\ref{sec:initial_design} whilst also keeping the code clean and readable. To counter this,
-I designed a new, modular system that leaned more heavily into Object-Oriented paradigms than
-functional ones. All major sections of functionality, including \gls{blazon} parsing, \charge{} and
-quarter rendering, were encapsulated in their own class with clear names and well-defined, shared
-APIs. This new design was written to follow the SOLID~\autocite{martin2000design} object-oriented
-design principles where possible.
+Section~\ref{sub:first_iteration} whilst also keeping the code clean and readable. This started the
+second design iteration of the project. In this iteration, I designed a new, modular system that
+leaned more heavily into Object-Oriented paradigms than functional ones. This new design was
+written to follow the principles of delegation, decoupling, the Single
+Responsibility~\autocite{martin2000design} and Open/Closed principles~\autocite{martin2000design}.
+
+The Single Responsibility principle dictates that a class should have one, and only one, reason to
+change. In \textit{Design Principles and Design Patterns}~\autocite{martin2000design}, Martin
+defines a responsibility as a reason to change, such that a class should only change if that one
+responsibility changes. If another responsibility is introduced, it should be given its own class.
+This principle works well with decoupling as responsibilities can be changed in individual classes
+without affecting other classes that use it. The Open/Closed principle dictates that a class should
+be open to extension but closed to modification. A typical example of this would be using abstract
+classes; the interface specified by the abstract class is closed to modification, but the child
+classes may extend the functionality in their implementation. Thus, another class depending on the
+class extending the abstract class can rely on the interface without having to know about the
+internals.
+
+To comply with these principles, all major sections of functionality, including \blazon
+payload parsing, \charge and \quarter rendering, were encapsulated in their own classes with clear
+names and well-defined, shared APIs.
+
+The new design had a top-level class of \texttt{\ublazon} which had a single public function,
+\texttt{draw()}. The \texttt{draw} method, as before, would clear the shield and then delegate
+drawing responsibility to specialised \texttt{\charge{}} and \texttt{\quarter{}} renderers by
+calling their \texttt{draw()} methods. This \texttt{\ublazon} class became the new entry-point, being
+instantiated and called in a \texttt{main()} function in \texttt{index.ts}. In a similar fashion to
+the top-level \texttt{\ublazon} class, a \texttt{\Gls{quarter}} class was defined to enable proper
+delegation for rendering both the \quarter and the \charges contained within the quarter.
+
+In this refactor, I also made use of an \svg property: clip paths. Clip paths allowed defining a
+path that cropped the element it was defined on. This was particularly useful for drawing \charges
+inside of \quarters as the edges outside of the \quarter would be cropped out by the clip path
+defined for that \quarter.
+
+\subsection{Second Design Implementation}%
+\label{sub:second_design_implementation}
+
+
 
 \subsection{SOLID Design Principles}%
 \label{sub:solid_design_principles}
 
-\todo{Refactor all this, see photos, break principles into relevant sections.}
+\todo{Refactor all of this, see photos, break principles into relevant sections.}
 
 SOLID object-oriented design is a collection of 5 design principles:
 
@@ -528,7 +572,7 @@ SOLID object-oriented design is a collection of 5 design principles:
     reason to change;
   \item \textit{The Open Closed Principle} --- you should be able to extend a class's behaviour,
     without modifying it;
-  \item \textit{The Liskov Substitution Principle} --- derived classes must be substituable for
+  \item \textit{The Liskov Substitution Principle} --- derived classes must be substitutable for
     their base classes;
   \item \textit{The Interface Segregation Principle} --- make fine grained interfaces that are
     client specific and
