@@ -1,4 +1,5 @@
 % vim: textwidth=99 spell spelllang=en_gb:
+% chktex-file 36
 
 \documentclass[nobib, a4paper, twoside, justified]{tufte-book}
 
@@ -21,6 +22,8 @@
 \usepackage{graphicx} % allow embedded images
 \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
 \graphicspath{{graphics/}} % set of paths to search for images
+\DeclareGraphicsExtensions{.pdf,.png}
+
 \usepackage{amsmath}  % extended mathematics
 \usepackage{booktabs} % book-quality tables
 \usepackage{units}    % non-stacked fractions and better unit spacing
@@ -293,6 +296,8 @@ the project. Core heraldry terminology includes:
   \item \textit{\Gls{tincture}} --- the colours and patterns for \charges{}, ordinaries and fields.
 \end{itemize}
 
+All relevant heraldry terminology may be found in the Glossary on page~\pageref{glossary}.
+
 \chapter{Design}%
 \label{cha:design}
 
@@ -553,64 +558,13 @@ SOLID object-oriented design is a collection of 5 design principles:
 
 
 
-\backmatter
+\backmatter%
 
 \printbibliography[heading=bibintoc]
 
-\printglossary
+\printglossary%
+\label{glossary}
 
-\appendix
-\setboolean{@mainmatter}{true}
-
-\chapter{Interfaces and Enums}%
-\label{cha:interfaces_and_enums}
-
-\begin{verbatim}
-enum ETincture {
-  /** For specifying Quarters */
-  Quarterly = "quarterly",
-  /** Gold/yellow */
-  Or = "or",
-  /** White */
-  Argent = "argent",
-  /** Blue */
-  Azure = "azure",
-  /** Red */
-  Gules = "gules",
-  /** Purple */
-  Purpure = "purpure",
-  /** Black */
-  Sable = "sable",
-  /** Green */
-  Vert = "vert",
-}
-
-enum ECharge {
-  Bend = "bend",
-  Cross = "cross",
-  Chief = "chief",
-  Saltire = "saltire",
-}
-
-enum EQuarter {
-  TL = "quarterly_tl",
-  TR = "quarterly_tr",
-  BL = "quarterly_bl",
-  BR = "quarterly_br",
-}
-
-interface ICharge {
-  charge: ECharge;
-  sinister?: boolean;
-  tincture?: ETincture;
-}
-
-interface IBlazon {
-  field: ETincture;
-  charges: ICharge[];
-}
-\end{verbatim}
-
-\setboolean{@mainmatter}{false}
+\input{appendix.tex}
 
 \end{document}
