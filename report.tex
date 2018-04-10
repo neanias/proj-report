@@ -289,13 +289,24 @@ tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
 \section{Related Works}%
 \label{sec:related_works}
 
-\todo{Add more related works}
+The problem at hand has been partially solved before: Robert Billard wrote
+\textit{Blazons!}~\autocite{dos_blazon} for Windows 3.1 and 95 and Mark Shoulson and Arnt Richard
+Johansen wrote \textit{pyBlazon}~\autocite{pyblazon} in 2008. Unfortunately, I was unable to get
+\textit{Blazons!} to run, due to hardware and software constraints, so am unable to comment on how
+well it solved the problem. \textit{pyBlazon} solves the problem exceptionally well, but only
+solves it for basic escutcheons, and does not render quarterly shields. Thus, a primary goal of
+this project was to support this. \textit{pyBlazon}, as the name suggests, is implemented in Python
+and hosted in a PHP webserver. My plan to implement the rendering in TypeScript (see
+Section~\ref{sec:core_concepts}) would aid portability as the code would be able to run on all
+modern browsers, whilst also being decoupled from the back-end, allowing pluggable implementations
+of the parsing.
 
-Whilst many escutcheons have been drawn and uploaded to WikiMedia in
-\svg~\autocite{ferraiolo2000scalable} format (some of which have been used in this report), many
-appear to have been created in Inkscape~\autocite{inkscape}, rather than being created
-programmatically. Much work has been done in collecting and cataloguing \blazons themselves ---
-namely John Papworth as mentioned in Section~\ref{sec:motivation}.
+Despite these tools existing, many escutcheons drawn and uploaded to WikiMedia in
+\svg~\autocite{ferraiolo2000scalable} format appear to have been created in
+Inkscape~\autocite{inkscape}, rather than being created using the developed tools. Much work has
+been done in collecting and cataloguing \blazons themselves --- namely John Papworth as mentioned
+in Section~\ref{sec:motivation} --- giving plenty of examples against which to test the finally
+completed application.
 
 \section{Summary}%
 \label{sec:background_summary}
@@ -870,7 +881,7 @@ examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shield
     \def\svgwidth{0.3\linewidth}%
     \input{graphics/quarterly_example.pdf_tex}
   }
-  \caption{Some quarterly examples drawn by the web app.}
+  \caption{Some quarterly examples drawn by the web app.}%
   \label{fig:quarterly_shields}
 \end{figure*}
 
