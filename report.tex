@@ -116,9 +116,9 @@
 \begin{publicationmeta}
   \section*{Acknowledgements}
   I would like to thank my supervisor, Julian Bradfield, for his help and advice as I was writing
-  this project. I would also like to thank all my friends on Level 9 of Appleton Tower who helped
-  keep me going through the long, arduous journey that was this project and 4\textsuperscript{th}
-  year as a whole.
+  this project. I would also like to thank all my friends on Level 9 of Appleton Tower,
+  particularly Connie and Paul, who helped keep me going through the long, arduous journey that was
+  this project and 4\textsuperscript{th} year as a whole.
 
   \section*{Declaration}
   I declare that this thesis was composed by myself,
@@ -324,7 +324,11 @@ TypeScript~\autocite{typescript}. Python seemed like an obvious choice with its 
 \gls{nlp} through the \gls{nltk}~\autocite{bird2004nltk}. TypeScript is a typed superset of
 JavaScript written by Microsoft that compiles, or \textit{\glspl{transpile}}, to plain JavaScript.
 TypeScript was chosen as a nicer alternative to programming in pure JavaScript, thanks to the
-addition of powerful features such as types, access control and abstract classes.
+addition of powerful features such as types, access control and abstract classes. As a note to the
+reader, to maintain interoperability with JavaScript, TypeScript uses trailing types, rather than
+preceding types as in C. An example being that an \texttt{int} defined in C would be
+\texttt{int~limit}, but in TypeScript, this would be \texttt{limit:~number}. (JavaScript/TypeScript
+also has a unified \texttt{number} type to handle both \texttt{float}s and \texttt{int}s.)
 
 The core design for this project centred around having a split stack; with a Python back-end
 parsing the \blazon, serialising it into JSON \marginnote{\gls{json} is a lightweight
@@ -732,12 +736,50 @@ worked.
 \subsubsection{\texttt{Renderer} Hierarchy}%
 \label{ssub:renderer_hierarchy}
 
-Open/Closed - \texttt{Renderer} hierarchy
+This new design made use of the \textit{Liskov Substitution} and Open/Closed
+principles~\autocite{martin2000design} (the Open/Closed principle being described in
+Section~\ref{ssub:design_principles}). The Liskov Substitution principle dictates that derived
+classes must be substitutable for their base class. This is well implemented with abstract classes
+as they provide a reliable interface and force inheriting classes to implement the abstracted
+methods defined within. As a reminder, the Open/Closed principle dictates that classes should be
+closed to modification but open to extension.
 
-\subsubsection{\texttt{ChargeShape} and \texttt{QuarterShape} Abstraction}%
+Applying these principle, I redesigned the rendering structure to have common methods and
+attributes belonging to both \texttt{ChargeRenderer} and \texttt{QuarterRenderer} in a new abstract
+parent class, \texttt{Renderer}. This helped refine and enforce the previously specified API of
+render classes having a main entry-point of \texttt{draw()}. Using an abstract class not only gave
+assurances to classes that used its implementations that there would always be a \texttt{draw()}
+function, but also gave child classes the shared functions that both required whilst allowing them
+to specialise in their individual use cases. It also meant that previously ambiguous attribute
+names could be named more specifically for the particular \texttt{Renderer} implementation. An
+example of this being that where \texttt{ChargeRenderer} previously had an attribute of
+\texttt{charge} with a union type of \texttt{ECharge~|~EQuarter}, the \texttt{charge} attribute
+could now have a type of just \texttt{ECharge} and \texttt{QuarterRenderer} could have an attribute
+of \texttt{quarter} with type \texttt{EQuarter}.
+
+\subsubsection{\texttt{ChargeShapes} and \texttt{QuarterShapes} Abstraction}%
 \label{ssub:chargeshape_and_quartershape_abstraction}
 
-Dependency Inversion - \texttt{AShape}, \texttt{AQuarterShape}
+In a similar fashion to the \texttt{Renderer} redesign, I devised a new design for the attributes
+and transforms for \texttt{ChargeShapes}. Rather than having all paths defined in a \texttt{Map} in
+the \texttt{ChargeShapes}, a new abstract class, \texttt{AShape}, would be defined with a
+\texttt{dimensions} \texttt{Map} and a \texttt{transforms(transform:~string):~string} method. Each
+charge then extended \texttt{AShape}, implemented the two abstract properties and was imported by
+the \texttt{ChargeShapes} class. The \texttt{ChargeShapes} was redesigned to have a boolean
+function, \texttt{hasChargePath(charge:~string)} to check if it knew the given charge.
+\texttt{ChargeShapes} also had a static function, \texttt{chargeShapes(charge:~ECharge)} which
+returned an instance of \texttt{AShape}. This design makes use of the \textit{Dependency Inversion}
+principle~\autocite{martin2000design}, which says that a class should depend on abstractions,
+rather than concretions. In this case, when renderers call out to \texttt{ChargeShapes} for the
+relevant \texttt{chargeShapes} object, they are returned an \texttt{AShape} object. This increases
+reusability as well as extensibility of charge rendering as one just needs to create a new
+\texttt{AShape} class, import it into the \texttt{ChargeShapes} class and add it to the relevant
+methods.
+
+Quarter shapes were also extracted into their own hierarchy, mirroring that of the \texttt{AShape}
+hierarchy. \texttt{AQuarterShape} only exposed a \texttt{dimensions} \texttt{Map} however.
+
+%Dependency Inversion - \texttt{AShape}, \texttt{AQuarterShape}
 
 \subsection{Third Design Implementation}%
 \label{sub:third_design_implementation}
@@ -745,23 +787,92 @@ Dependency Inversion - \texttt{AShape}, \texttt{AQuarterShape}
 The Figure references in the following headings refer to the UML diagrams in
 Appendix~\ref{sec:third_design_iteration_diagrams}.
 
-\subsubsection{Renderer (Figure~\ref{fig:RendererUML})}%
+\subsubsection{\texttt{Renderer} (Figure~\ref{fig:RendererUML})}%
 \label{ssub:renderer}
 
-\subsubsection{ChargeRenderer (Figure~\ref{fig:RendererUML})}%
+The new \texttt{Renderer} class contained 3 protected, inherited attributes, \texttt{chargeId:
+string}, \texttt{tincture:~ETincture} and \texttt{parentChargesLayer: d3.Selection}. Whilst the
+clas had 3 attributes, only \texttt{tincture} and \texttt{parentChargesLayer} were assigned in the
+constructor; inherited classes were given responsibility of generating their own \texttt{id}s. As
+mentioned in Section~\ref{sub:third_design_iteration}, \texttt{Renderer} defined an abstract method
+of \texttt{draw(): void} to be implemented in inherited classes. The \texttt{updateChargesLayer}
+method was extracted from \texttt{ChargeRenderer} into the parent class to be available for both
+child classes to inherit and use. \texttt{getRandomInt} was similarly extracted.
+
+\subsubsection{\texttt{ChargeRenderer} (Figure~\ref{fig:RendererUML})}%
 \label{ssub:chargerenderer}
 
-\subsubsection{QuarterRenderer (Figure~\ref{fig:RendererUML})}%
+Now inheriting from \texttt{Renderer}, \texttt{ChargeRenderer} had just two attributes defined on
+it: \texttt{charge: ECharge} and \texttt{sinister: boolean}. The \texttt{draw} method now had an
+optional argument of \texttt{quarter: EQuarter} which would correspond to the \texttt{id} of the
+\texttt{<clipPath>} that contained this \charge. As before, the method performed environment setup
+in the \svg document ready for the new \charge, then called out to \texttt{drawCharge}, however
+after performing all this, \texttt{draw} now also called \texttt{applyTransforms}.
+\texttt{applyTransforms} took in the \texttt{currentCharge} element and an optional
+\texttt{quarter} argument, built a \texttt{transform} string based on the parameters, fetched the
+appropriate transformation from \texttt{ChargeShapes} and applied it to the \texttt{currentCharge}.
+
+\subsubsection{\texttt{QuarterRenderer} (Figure~\ref{fig:RendererUML})}%
 \label{ssub:quarterrenderer}
 
-\subsubsection{AShape and AQuarterShape (Figure~\ref{fig:AShapeUML})}%
+As with \texttt{ChargeRenderer}, \texttt{QuarterRenderer} had only one attribute now defined on it:
+\texttt{quarter: EQuarter}. Whereas before, the \texttt{draw} method called out to
+\texttt{ChargeRenderer} to draw a quarter onto the shield, it now called its own
+\texttt{drawQuarter} method. \texttt{drawQuarter} had much the same functionality as
+\texttt{drawCharge} perviousyt held, but exclusively worked on \texttt{QuarterShapes}.
+\texttt{addClipPathDefinition} remained unchanged.
+
+\subsubsection{\texttt{AShape} and \texttt{AQuarterShape} (Figure~\ref{fig:AShapeUML})}%
 \label{ssub:ashape_and_aquartershape}
 
-\subsubsection{ChargeShapes (Figure~\ref{fig:ChargeShapesUML})}%
-\label{ssub:chargeshapes}
+As mentioned in Section~\ref{ssub:chargeshape_and_quartershape_abstraction}, \texttt{AShape}
+defined a pair of abstractions: the \texttt{dimensions} \texttt{Map} and the \texttt{transforms}
+method. The \texttt{dimensions} \texttt{Map} was a simple \texttt{Map<string, string>} containing
+relevant entries previously defined in the \texttt{ChargeShapes} class. \texttt{transforms} took a
+transform string as an argument, with implementations using a \texttt{switch} statement to match
+against it to specify the necessary transformation.
 
-\subsubsection{QuarterShapes}%
-\label{ssub:quartershapes}
+\texttt{AQuarterShape}, not needing any transformations, simply defined an abstract
+\texttt{dimensions} \texttt{Map} that paralleled that of \texttt{AShape}.
+
+\subsubsection{\texttt{ChargeShapes} (Figure~\ref{fig:ChargeShapesUML}) and \texttt{QuarterShapes}}%
+\label{ssub:chargeshapes_and_quartershapes}
+
+Having extracted all the previous dimensions into their own classes, \texttt{ChargeShapes} now
+provided a single point-of-access for all \charges. It had a private, static array containing the
+names of each imported \charge. To check whether the \charge could be drawn, it exposed a boolean
+function, \texttt{hasChargePath(charge: string)} that scanned over the array to check whether the
+argument given to it was contained within. A new function \texttt{chargeShapes(charge:~ECharge)}
+was defined to replace the newly-removed \texttt{chargePaths} \texttt{Map} which returned a new
+object for the relevant \texttt{AShape}. When the \texttt{ChargeRenderer} called this, it was then able to
+chain methods together without concerns about which \texttt{AShape} it had been given.
+
+Again, to mirror the new \texttt{ChargeShapes} implementation, \texttt{QuarterShapes} was also
+defined with a sole \texttt{quarterShapes(quarter:~EQuarter)} which returned a new object for the
+relevant \texttt{AQuarterShape}. The implementations for both \texttt{QuarterShapes} and
+\texttt{AQuarterShape} were unnecessarily verbose, but were done purposefully to be keep the code
+open-ended and extensible for future functionality.
+
+\subsection{Third Iteration Evaluation}%
+\label{sub:third_iteration_evaluation}
+
+The major goals of the project were now realised, with quarterly shields being reliably drawn. Some
+examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shields}.
+
+\begin{figure*}[h]
+  \subfloat[A shield with the escutcheons of the 4 patron saints of the United Kingdom.]{%
+    \def\svgwidth{0.3\linewidth}%
+    \input{graphics/britain_shield.pdf_tex}
+  }
+  \qquad
+  \subfloat[\textit{Quarterly: 1st and 4th: Gules, a bend Sable; 2nd and 3rd: Azure, a chief
+  Or}.]{%
+    \def\svgwidth{0.3\linewidth}%
+    \input{graphics/quarterly_example.pdf_tex}
+  }
+  \caption{Some quarterly examples drawn by the web app.}
+  \label{fig:quarterly_shields}
+\end{figure*}
 
 \chapter{Results and Discussion}%
 \label{cha:results_and_discussion}
