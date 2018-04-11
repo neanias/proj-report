@@ -152,18 +152,17 @@ potential application for ancestry companies that build family trees. Given the
 \section{Project Aim}%
 \label{sec:project_aim}
 
-The aims for this project include:
-
-\begin{itemize}
-  \item Designing and implementing a program to parse \blazons and
-  \item Designing and implementing a web app to render the parsed \blazon by drawing \charges and
-    \glspl{ordinary}.
-\end{itemize}
-
 This project was written as a paired project and as such I only wrote the side of the project that
 deals with rendering the \blazons, rather than the parsing. The parsing was implemented by my
 partner, Anthony Gallagher, and, as such, the not be covered in this report.  Important shared
 design elements will however be covered in Section~\ref{sec:core_concepts}.
+
+The aims for this project include:
+
+\begin{itemize}
+  \item Designing and implementing a web app to render the parsed \blazon by drawing \charges and
+    \glspl{ordinary}.
+\end{itemize}
 
 \section{Contributions}%
 \label{sec:contributions}
@@ -174,6 +173,25 @@ In this honours project, my contributions included:
   \item Drawing the \charges and \quarters used on the shield, or \textit{\gls{escutcheon}},
   \item Writing the base web server and
   \item Writing the \quarter and \charge drawing algorithm.
+\end{itemize}
+
+\section{Report Structure}%
+\label{sec:report_structure}
+
+Following this chapter, the report is broken up into further 5 chapters with the following content:
+
+\begin{itemize}
+  \item \textbf{Chapter 2} presents the background surrounding the problem, with a beginner's
+    guide to basic heraldry terms and the history surrounding heraldry, as well as other works
+    related to this project;
+  \item \textbf{Chapter 3} describes the overarching design decisions taken to guide the project in
+    its implementation, along with its dependencies;
+  \item \textbf{Chapter 4} provides an in-depth discussion of the iterative design and implementation
+    process as I worked on solving the problem presented;
+  \item \textbf{Chapter 5} evaluates the results, with regard to automated testing, other tools
+    solving a similar, if not the same problem, and shortcomings that the final implementation
+    had, and
+  \item \textbf{Chapter 6} concludes the work with further work that could be undertaken.
 \end{itemize}
 
 \chapter{Background}\label{cha:background}
@@ -440,7 +458,7 @@ An iterative design was used for writing the code for this project. Iterative de
 process of designing, prototyping and evaluating. One designs and prototypes a new feature before
 evaluating the final feature design. If the design is acceptable, the new feature is implemented,
 otherwise the cycle restarts. An iterative design process enables one to address different functionality
-as separate tasks, building on top of one another. It also allows heavy refactors of a project
+as separate tasks, building on top of one another. It also allows for heavy refactors of a project
 whilst staying in one cycle.
 
 \chapter{Implementation}%
@@ -905,7 +923,7 @@ Appendix~\ref{sec:third_design_iteration_diagrams}.
 
 The new \texttt{Renderer} class contained 3 protected, inherited attributes, \texttt{chargeId:
 string}, \texttt{tincture: ETincture} and \texttt{parentChargesLayer: d3.Selection}. Whilst the
-clas had 3 attributes, only \texttt{tincture} and \texttt{parentChargesLayer} were assigned in the
+class had 3 attributes, only \texttt{tincture} and \texttt{parentChargesLayer} were assigned in the
 constructor; inherited classes were given responsibility of generating their own \texttt{id}s. As
 mentioned in Section~\ref{sub:third_design_iteration}, \texttt{Renderer} defined an abstract method
 of \texttt{draw(): void} to be implemented in inherited classes. The \texttt{updateChargesLayer}
@@ -932,7 +950,7 @@ As with \texttt{ChargeRenderer}, \texttt{QuarterRenderer} had only one attribute
 \texttt{quarter: EQuarter}. Whereas before, the \texttt{draw} method called out to
 \texttt{ChargeRenderer} to draw a quarter onto the shield, it now called its own
 \texttt{drawQuarter} method. \texttt{drawQuarter} had much the same functionality as
-\texttt{drawCharge} perviousyt held, but exclusively worked on \texttt{QuarterShapes}.
+\texttt{drawCharge} previously held, but exclusively worked on \texttt{QuarterShapes}.
 \texttt{addClipPathDefinition} remained unchanged.
 
 \subsubsection{\texttt{AShape} and \texttt{AQuarterShape} (Figure~\ref{fig:AShapeUML})}%
@@ -969,8 +987,8 @@ open-ended and extensible for future functionality.
 \subsection{Third Iteration Evaluation}%
 \label{sub:third_iteration_evaluation}
 
-The major goals of the project were now realised, with quarterly shields being reliably drawn. Some
-examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shields}.
+The project aim that I was pursuing was now realised, with quarterly shields being reliably drawn.
+Some examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shields}.
 
 \begin{figure*}[h]
   \subfloat[A shield with the escutcheons of the 4 patron saints of the United Kingdom.]{%
@@ -987,14 +1005,66 @@ examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shield
   \label{fig:quarterly_shields}
 \end{figure*}
 
-\chapter{Results and Discussion}%
-\label{cha:results_and_discussion}
+\chapter{Evaluation}%
+\label{cha:evaluation}
 
 \section{Automated Testing}%
 \label{sec:automated_testing}
 
-\section{Rendering Testing}%
-\label{sec:rendering_testing}
+I had troubles with setting up integration tests to ensure that the web app was calling the
+libraries with correct parameters. However, as mentioned in
+Section~\ref{sec:external_dependencies}, I used jest~\autocite{jest} to write unit tests for some
+modules, specifically to ensure implementations of AShape were returning the correct data depending
+on their inputs.
+
+\section{Comparison With Existing Solutions}%
+\label{sec:comparison_with_existing_solutions}
+
+The other solution to this problem, as mentioned in Section~\ref{sec:related_works}, was
+pyBlazon~\autocite{pyblazon} which does not support quarterly shields, so only basic
+\glspl{escutcheon} may be compared. A comparison of both pyBlazon and this project rendering the
+blazon for the Scrope \gls{escutcheon} can be seen in figure~\ref{fig:pyblazon_scrope_comparison}.
+As noted in Section~\ref{sec:heraldry}, there are no shades specified for a tincture, hence the
+difference in colours of pyBlazon's bend and this project's.
+
+\todo{Add more comparisons.}
+
+\begin{figure}
+  \centering
+  \subfloat[pyBlazon]{%
+    %\def\svgwidth{0.425\linewidth}%
+    %\input{graphics/pyblaze_scrope.pdf_tex}
+    \includegraphics[width=0.45\linewidth]{pyblaze_scrope.png}
+  }
+  \qquad
+  \subfloat[This project]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/scrope.pdf_tex}
+  }
+  \caption{A comparison of the Scrope \gls{escutcheon} (\textit{Azure, a bend Or}) being rendered
+  by both this project and pyBlazon.}%
+  \label{fig:pyblazon_scrope_comparison}
+\end{figure}
+
+\section{Shortcomings}%
+\label{sec:shortcomings}
+
+Due to time constraints, we were not able to integrate the front- and back-ends, with the server
+configured to return mocked out responses for well-formed blazons.
+
+In some quarters, the charges didn't fully fit, resulting in off-centred shapes to hide the visible
+field. An example of this can be seen in Figure~\ref{fig:quarterly_shields}, where the bottom right
+saltire is not aligned with the saltire above it. Similarly, the saltire in the top right corner
+should sit much higher within the quarter. This was due to drawing the saltire to match the
+dimensions of the shield outline, but not accounting for the differing dimensions of redrawing this
+within a quarter. A fix for this particular issue would be to draw the shapes much larger than
+their intended bounds and rely on \svg clip paths to keep the shape within the outline.
+
+The project is currently only designed to accept correctly-formed data and does not handle
+ill-formed data properly, short of throwing an exception. Ideally, it should be able to reject and
+recover from ill-formed responses from the server, either through checking the validity of the data
+before working on it or through ignoring data that cannot be processed. More feedback to the user
+should also be given, should they enter a blazon that is unable to be parsed.
 
 \chapter{Conclusion}%
 \label{cha:conclusion}
@@ -1002,10 +1072,17 @@ examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shield
 \section{Overview}%
 \label{sec:overview}
 
+\todo{Write conclusion}
+
 \section{Further Work}%
 \label{sec:further_work}
 
+Initial further work would be to make the fixes I have outlined in Section~\ref{sec:shortcomings}.
 
+An immediate piece of further work would be to add more shapes to \texttt{ChargeShapes}, such that
+the web app would be able to draw more \blazons. Given the current implementation, there is
+potential to implement \glspl{variation}-based \blazons through use of \svg clip paths. Similarly,
+adding support for drawing of \charges such as lions and fleur-de-lis might wished to be added.
 
 \backmatter%
 
