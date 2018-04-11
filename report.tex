@@ -91,7 +91,7 @@
 
 \let\lines\baselineskip{}
 
-\usepackage{glossaries}
+\usepackage[numberedsection=nameref]{glossaries}
 \setacronymstyle{long-short}
 
 \loadglsentries{glossary}
@@ -117,8 +117,8 @@
   \section*{Acknowledgements}
   I would like to thank my supervisor, Julian Bradfield, for his help and advice as I was writing
   this project. I would also like to thank all my friends on Level 9 of Appleton Tower,
-  particularly Connie and Paul, who helped keep me going through the long, arduous journey that was
-  this project and 4\textsuperscript{th} year as a whole.
+  particularly Connie, Paul and Simon, who helped keep me going through the long, arduous journey
+  that was this project and 4\textsuperscript{th} year as a whole.
 
   \section*{Declaration}
   I declare that this thesis was composed by myself,
@@ -133,14 +133,10 @@
 
 %\pagenumbering{Arabic}
 
-\mainmatter{}
+\mainmatter%
 
-\chapter{Introduction}\label{cha:introduction}
-
-This project was written as a paired project and as such I only wrote the side of the project that
-deals with rendering the \blazons{}, having been parsed by the back end. The back-end was
-written by my partner, Anthony Gallagher, and the writing of it will not be covered in this report.
-Important shared design elements will be covered however in Section~\ref{sec:core_concepts}.
+\chapter{Introduction}%
+\label{cha:introduction}
 
 \section{Motivation}\label{sec:motivation}
 
@@ -148,19 +144,36 @@ In 1874 --- 4 years after his death --- John Papworth's \textit{Ordinary of Brit
 published~\autocite{collins_1942}. In this work, he recorded approximately 50,000 entries of
 descriptions of families' coats of arms, none annotated.
 
-This honours project would make it possible to have these descriptions, or \textit{\blazons{}} as
+This honours project would make it possible to have these descriptions, or \textit{\blazons} as
 they are termed in heraldry (see~\ref{sec:heraldry}), drawn freely for people to view. This has
-potential application for ancestry companies that build family trees for people. Given the
-\blazon{}, they would be able to construct the shields visually.
+potential application for ancestry companies that build family trees. Given the
+\blazon, they would be able to construct the shields visually.
 
-\section{Contributions}\label{sec:contributions}
+\section{Project Aim}%
+\label{sec:project_aim}
+
+The aims for this project include:
+
+\begin{itemize}
+  \item Designing and implementing a program to parse \blazons and
+  \item Designing and implementing a web app to render the parsed \blazon by drawing \charges and
+    \glspl{ordinary}.
+\end{itemize}
+
+This project was written as a paired project and as such I only wrote the side of the project that
+deals with rendering the \blazons, rather than the parsing. The parsing was implemented by my
+partner, Anthony Gallagher, and, as such, the not be covered in this report.  Important shared
+design elements will however be covered in Section~\ref{sec:core_concepts}.
+
+\section{Contributions}%
+\label{sec:contributions}
 
 In this honours project, my contributions included:
 
 \begin{itemize}
-  \item Drawing the \charges{} and \quarters{} used on the shield, or \textit{\gls{escutcheon}},
+  \item Drawing the \charges and \quarters used on the shield, or \textit{\gls{escutcheon}},
   \item Writing the base web server and
-  \item Writing the \quarter{} and \charge{} drawing algorithm
+  \item Writing the \quarter and \charge drawing algorithm.
 \end{itemize}
 
 \chapter{Background}\label{cha:background}
@@ -171,8 +184,8 @@ Many families, countries and organisations --- primarily in Europe --- have coat
 arms were initially used on shields on the battlefield to identify individual knights, but later
 came to be used as flags and banners for individuals and families of the upper class at court. The
 Royal Coat of Arms of the United Kingdom, belonging to the British monarch, can be seen in
-Figure~\ref{fig:royal_coa}. If the reader wishes to learn more about Heraldry and its history, I
-would recommend to you the many heraldic works of Charles Boutell and John Brooke-Little.
+Figure~\ref{fig:royal_coa}. If the reader wishes to learn more about heraldry and its history, I
+would recommend the many heraldic works of Charles Boutell and John Brooke-Little.
 
 \begin{marginfigure}
   \centering
@@ -188,7 +201,7 @@ used to describe how the escutcheon is to be drawn is known as a \textit{\blazon
 \ublazons have been used since the Norman conquest and have been refined to a regular language
 in the process~\autocite{boutell_1864}, although, as John Brooke-Little said, ``many of the
 supposedly hard and fast rules laid down in heraldic manuals [including those by heralds] are often
-ignored.''~\autocite{brooke_little_1985} This flagrant disregard for the rules introduces
+ignored.''~\autocite{brooke_little_1985} This blatant disregard for the rules introduces
 difficulty in parsing the \blazons as the language loses some of its regularity.
 
 \begin{marginfigure}
@@ -196,21 +209,21 @@ difficulty in parsing the \blazons as the language loses some of its regularity.
   \def\svgwidth{0.8\linewidth}
   \input{graphics/Blason_Albert.pdf_tex}
   \caption{The shield of the town of Albert, France. \textit{Barry of ten argent and
-  gules}. Source:~\url{https://en.wikipedia.org/wiki/File:Blason_Albert.svg}}%
+  gules}. Source:~\url{https://upload.wikimedia.org/wikipedia/commons/e/ee/Blason_Albert.svg}}%
   \label{fig:blason_albert}
 \end{marginfigure}
 
 \ublazons have a few key attributes:
 \begin{itemize}
   \item The \textit{\gls{field}}, which is the background colour of the shield or
-    \quarter{};
+    \quarter;
   \item \textit{\Glspl{ordinary}}, which are geometric shapes (as seen in Figure~\ref{fig:scrope},
     bearing a golden slash, or \textit{bend});
   \item \textit{\Glspl{charge}}, which are small emblems, such as fleur-de-lis and lions;
-  \item \textit{\Glspl{variation}}, which describe how the field or \charge{} is patterned.
+  \item \textit{\Glspl{variation}}, which describe how the field or \charge is patterned.
     \Glspl{variation} can indicate patterns such as chequered or coloured lines (as seen in
     Figure~\ref{fig:blason_albert}); and
-  \item \textit{\Glspl{tincture}}, which are the colours and patterns for \charges{}, ordinaries
+  \item \textit{\Glspl{tincture}}, which are the colours and patterns for \charges, ordinaries
     and fields.
 \end{itemize}
 
@@ -220,7 +233,8 @@ derived from Norman French and so the names appear archaic. In heraldry, blue is
 red is \textit{gules} for instance. The metals are \textit{or} and \textit{argent}, for gold and
 silver respectively. Whilst the tinctures are linked to colours, the College of Arms does not
 specify which shade of that colour is required for the tinctures, leaving it to the artist to
-decide~\autocite{college_of_arms_faq}. In this case, I have used default CSS colours.
+decide~\autocite{college_of_arms_faq}. In this case, I have used default CSS colours, using the
+English names, for instance `red' for \textit{gules}.
 
 \begin{marginfigure}
   \centering
@@ -232,10 +246,10 @@ decide~\autocite{college_of_arms_faq}. In this case, I have used default CSS col
 
 \ublazons conventionally follow a form of starting with the \textit{\gls{tincture}} or
 \textit{\gls{variation}} of the field. After the description of the field,
-\textit{\glspl{ordinary}} and \textit{\charges{}} are named with their tinctures. An example of
+\textit{\glspl{ordinary}} and \textit{\charges} are named with their tinctures. An example of
 this is ``\textit{Purpure, a chief Gules}''. This \blazon describes an escutcheon with a field of
-\textit{purpure} (purple), with a \textit{Chief} \gls{ordinary} --- a bar across the top of the
-shield --- of \textit{gules} (red). This can be seen --- drawn by the web app --- in
+\textit{purpure} (purple), with a \textit{Chief} \gls{ordinary} (a bar across the top of the
+shield) of \textit{gules} (red). This can be seen (drawn by the project web app) in
 Figure~\ref{fig:chief_example}.
 
 \begin{marginfigure}
@@ -246,18 +260,18 @@ Figure~\ref{fig:chief_example}.
   \label{fig:scrope}
 \end{marginfigure}
 
-A simple --- but notable --- \blazon is that of the Scrope family. In the 14th century, the Baron
-Scrope brought a case action against Sir Robert Grosvenor when he noticed that they both had the
-same coat of arms. Many witnesses gave evidence in the case, including Geoffrey
+A simple, but notable, \blazon is that of the Scrope family. In the 14th century, the Baron Scrope
+brought a case action against Sir Robert Grosvenor when he noticed that they both had the same coat
+of arms. Many witnesses gave evidence in the case, including Geoffrey
 Chaucer~\autocite{scrope_grosvenor}. The case was ultimately decided in Scrope's favour. The Scrope
-coat of arms has a \blazon of \textit{Azure, a bend Or}; a depiction of this (as drawn by the web
-app written for this project) can be seen in Figure~\ref{fig:scrope}.
+coat of arms has a \blazon of \textit{Azure, a bend Or}; a depiction of this (as drawn by the
+project web app written for this project) can be seen in Figure~\ref{fig:scrope}.
 
 Whilst the Scrope arms are prominent in heraldry, they are simplistic and indicative of
-medi\ae{}val arms. Coats of arms became more complex as they developed through the centuries, with
+medieval arms. Coats of arms became more complex as they developed through the centuries, with
 instances of \textit{quarterly} shields, \textit{grand-quarterlies} --- quarterlies within
 quarterlies --- and \textit{differenced} arms. \textit{Differenced} arms involve adding an
-\textit{\gls{ordinary}} over an existing coat of arms. This was typically used to differentiate similar
+\gls{ordinary} over an existing coat of arms. This was typically used to differentiate similar
 looking coats of arms, especially between father and sons. Common examples of differentiated
 shields are seen in duchies' coats of arms, particularly those which were given to Charles II's
 illegitimate children. Examples of more complex shields can be seen in
@@ -265,7 +279,7 @@ Figure~\ref{fig:complex_shields}.
 
 \begin{figure*}[h]
   \subfloat[Neville, 16th Earl of Warwick's coat of arms. An example of grand-quarterlies and
-  differenced arms. Source:~\url{https://en.wikipedia.org/wiki/File:Neville_Warwick_Arms.svg}.]{%
+  differenced arms. Source:~\url{https://upload.wikimedia.org/wikipedia/commons/d/d1/Neville_Warwick_Arms.svg}.]{%
     \def\svgwidth{0.3\linewidth} %
     \input{graphics/Neville_Warwick_Arms.pdf_tex}
   }
@@ -291,22 +305,22 @@ tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
 
 The problem at hand has been partially solved before: Robert Billard wrote
 \textit{Blazons!}~\autocite{dos_blazon} for Windows 3.1 and 95 and Mark Shoulson and Arnt Richard
-Johansen wrote \textit{pyBlazon}~\autocite{pyblazon} in 2008. Unfortunately, I was unable to get
-\textit{Blazons!} to run, due to hardware and software constraints, so am unable to comment on how
-well it solved the problem. \textit{pyBlazon} solves the problem exceptionally well, but only
-solves it for basic escutcheons, and does not render quarterly shields. Thus, a primary goal of
-this project was to support this. \textit{pyBlazon}, as the name suggests, is implemented in Python
-and hosted in a PHP webserver. My plan to implement the rendering in TypeScript (see
-Section~\ref{sec:core_concepts}) would aid portability as the code would be able to run on all
-modern browsers, whilst also being decoupled from the back-end, allowing pluggable implementations
-of the parsing.
+Johansen wrote \textit{pyBlazon}~\autocite{pyblazon} in 2008. \textit{Blazon!} does not parse a
+blazon for automatic rendering, but provides an environment with predefined \charges and
+\glspl{ordinary} to build one's own \glspl{escutcheon}. \textit{pyBlazon} solves the problem
+exceptionally well, but only solves it for basic escutcheons, and does not render quarterly
+shields. Thus, a primary goal of this project is to support this. \textit{pyBlazon}, as the name
+suggests, is implemented in Python~\autocite{python} and hosted in a PHP webserver. My plan to implement the
+rendering in TypeScript~\autocite{typescript} (see Section~\ref{sec:core_concepts}) would aid portability as the code
+would be able to run on all modern browsers, whilst also being decoupled from the back-end,
+allowing pluggable implementations of the parsing.
 
 Despite these tools existing, many escutcheons drawn and uploaded to WikiMedia in
 \svg~\autocite{ferraiolo2000scalable} format appear to have been created in
 Inkscape~\autocite{inkscape}, rather than being created using the developed tools. Much work has
-been done in collecting and cataloguing \blazons themselves --- namely John Papworth as mentioned
-in Section~\ref{sec:motivation} --- giving plenty of examples against which to test the finally
-completed application.
+been done in collecting and cataloguing \blazons themselves (especially John Papworth as
+mentioned in Section~\ref{sec:motivation}) giving plenty of examples against which to test the
+finally completed application.
 
 \section{Summary}%
 \label{sec:background_summary}
@@ -314,15 +328,17 @@ completed application.
 In this chapter, we covered basic heraldry, including core terminology, as well as works related to
 the project. Core heraldry terminology includes:
 
+\pagebreak%
+
 \begin{itemize}
   \item \textit{\Gls{escutcheon}} --- the shield in the coat of arms;
   \item \textit{\Gls{field}} --- the background of the escutcheon;
   \item \textit{\Glspl{ordinary}} --- geometric shapes on the escutcheon;
   \item \textit{\Glspl{charge}} --- small emblems, such as fleur-de-lis and lions; and
-  \item \textit{\Gls{tincture}} --- the colours and patterns for \charges{}, ordinaries and fields.
+  \item \textit{\Gls{tincture}} --- the colours and patterns for \charges, ordinaries and fields.
 \end{itemize}
 
-All relevant heraldry terminology may be found in the Glossary on page~\pageref{glossary}.
+All relevant heraldry terminology may be found in the Glossary on page~\pageref{main}.
 
 \chapter{Design}%
 \label{cha:design}
@@ -330,33 +346,32 @@ All relevant heraldry terminology may be found in the Glossary on page~\pageref{
 \section{Core Concepts}%
 \label{sec:core_concepts}
 
-The two languages chosen for implementing this project were Python and
+The two languages chosen for implementing this project were Python~\autocite{python} and
 TypeScript~\autocite{typescript}. Python seemed like an obvious choice with its good support for
 \gls{nlp} through the \gls{nltk}~\autocite{bird2004nltk}. TypeScript is a typed superset of
-JavaScript written by Microsoft that compiles, or \textit{\glspl{transpile}}, to plain JavaScript.
-TypeScript was chosen as a nicer alternative to programming in pure JavaScript, thanks to the
-addition of powerful features such as types, access control and abstract classes. As a note to the
-reader, to maintain interoperability with JavaScript, TypeScript uses trailing types, rather than
-preceding types as in C. An example being that an \texttt{int} defined in C would be
-\texttt{int~limit}, but in TypeScript, this would be \texttt{limit:~number}. (JavaScript/TypeScript
-also has a unified \texttt{number} type to handle both \texttt{float}s and \texttt{int}s.)
+JavaScript written by Microsoft that compiles to plain JavaScript.  TypeScript was chosen as a
+nicer alternative to programming in pure JavaScript, thanks to the addition of powerful features
+such as types, access control and abstract classes. As a note to the reader, to maintain
+interoperability with JavaScript, TypeScript adds type definitions after the variable name, rather
+than before it, as in C. An example being that an \texttt{int} defined in C would be \texttt{int
+limit}, but in TypeScript, this would be \texttt{limit: number}. (JavaScript/TypeScript also has a
+unified \texttt{number} type to handle both \texttt{float}s and \texttt{int}s.)
 
-The core design for this project centred around having a split stack; with a Python back-end
-parsing the \blazon, serialising it into JSON \marginnote{\gls{json} is a lightweight
-  data-interchange format, consisting of key-value pairs, array data types and other serialisable
-  data types (such as strings, numbers and booleans). JSON is derived from JavaScript's associative
-array-style data type, \texttt{Object}. An example of JSON can be seen in
-Figure~\ref{fig:expected_output}.} and passing it to the TypeScript front-end, which then drew it
-onto the webpage. This allowed for large amounts of flexibility, enabling the two halves of the
-project to be developed in tandem with the Separation of Concerns principle being adhered to
-throughout. It also allows for pluggable rendering implementations as the JSON schema for drawing
-\payloads can be well-defined.
+The core design for this project centres around having a split stack; with a Python back-end
+parsing the \blazon, serialising it into JSON\footnote{\gls{json} is a lightweight data-interchange
+  format, consisting of key-value pairs, array data types and other serialisable data types (such
+  as strings, numbers and booleans). JSON is derived from JavaScript's associative array-style data
+type, \texttt{Object}. An example of JSON can be seen in Figure~\ref{fig:expected_output}.} and
+passing it to the TypeScript front-end, which would then draw it onto the webpage. This allowed for
+large amounts of flexibility, enabling the two halves of the project to be developed in tandem with
+the Separation of Concerns principle being adhered to throughout. It also allows for pluggable
+rendering implementations as the JSON schema for drawing \payloads can be well-defined.
 
-The Python back-end received a JSON \payload from the webpage containing the \blazon; it parsed the
-\blazon using a Context-Free Grammar (CFG) parser and identified the most important parts of the
-\blazon. It then serialised these back into a JSON response to be sent to the webpage for rendering.
+The Python back-end receives a JSON \payload from the webpage containing the \blazon; it parses the
+\blazon using a Context-Free Grammar (CFG) parser and identifies the most important parts of the
+\blazon. It then serialises these back into a JSON response to be sent to the webpage for rendering.
 The specification was such that if the webpage was given a \blazon of ``Azure, a bend Or'', it would
-return the JSON \payload seen in Figure~\ref{fig:expected_output}.
+return the JSON response seen in Figure~\ref{fig:expected_output}.
 
 \begin{figure}[h]
   \begin{verbatim}
@@ -368,49 +383,50 @@ return the JSON \payload seen in Figure~\ref{fig:expected_output}.
       }]
     }
   \end{verbatim}
-  \caption{Expected output from the Python back end, for a given \blazon of ``Azure, a bend Or''.}%
+  \caption{Expected response from the Python back end, for a given \blazon of ``Azure, a bend Or''.}%
   \label{fig:expected_output}
 \end{figure}
 
-The TypeScript front-end received this \payload, applied the \textit{azure} CSS class to the field
-element, then drew a bend onto the field with an \textit{or} CSS class.
+The TypeScript front-end receives this response, applies the \texttt{azure} CSS class to the field
+element, then draws a bend onto the field with an \texttt{or} CSS class. The rendering of this
+response can be seen in Figure~\ref{fig:scrope}. The front-end does not use a framework and is just
+written in plain TypeScript.
 
-Escutcheons were drawn using the \svg{} format for portability across browsers as well as the
-eponymous scalability of \svg{} images. This allowed drawn escutcheons to be embedded elsewhere
-with ease, either directly or through rendering the \svgs{} as other image formats via programmes
-like Inkscape.
+Escutcheons are drawn using the \svg format for portability across browsers as well as the
+eponymous scalability of \svg images. This allows drawn escutcheons to be embedded elsewhere with
+ease, either directly or through rendering the \svgs as other image formats via programs like
+Inkscape.
 
 For version control, \texttt{git}~\autocite{git} was used and all code was hosted on GitHub.
 
 \section{External Dependencies}%
 \label{sec:external_dependencies}
 
-The front-end depended on a pair of libraries for \svg{} rendering and \dom{} manipulation: the
-selection library of D3.js~\autocite{d3js} and jQuery~\autocite{jquery}. D3.js provides many
-powerful functions for \svg{} and \dom{} manipulation, especially creating and editing \svg{} and
-HTML elements. It would also rely on jQuery for further \dom{} manipulation. The Mozilla Developer
-Network defines the \dom{} as such: ``The \glsentryfirst{dom} connects web pages to scripts or
-programming languages. Usually that means JavaScript, but modelling HTML, SVG, or XML documents as
-objects is not part of the JavaScript language. The \dom{} model represents a document with a
-logical tree. Each branch of the tree ends in a node, and each node contains objects.  \dom{}
-methods allow programmatic access to the tree; with them you can change the document's structure,
-style or content. Nodes can have event handlers attached to them. Once an event is triggered, the
-event handlers get executed.''~\autocite{mdn_dom}.
+The front-end depends on a pair of libraries for \svg rendering and \dom manipulation: the
+selection library of D3.js~\autocite{d3js} and jQuery~\autocite{jquery}. D3.js and jQuery both
+provide many powerful functions for \svg and \dom manipulation. The Mozilla Developer Network
+defines the \dom as such: ``The \glsentryfirst{dom} connects web pages to scripts or programming
+languages. Usually that means JavaScript, but modelling HTML, SVG, or XML documents as objects is
+not part of the JavaScript language. The \dom model represents a document with a logical tree.
+Each branch of the tree ends in a node, and each node contains objects. \dom methods allow
+programmatic access to the tree; with them you can change the document's structure, style or
+content. Nodes can have event handlers attached to them. Once an event is triggered, the event
+handlers get executed.''~\autocite{mdn_dom}.
 
-For further assets, Sass~\autocite{sass-lang} was used as a CSS pre-processor and
-Bootswatch~\autocite{bootswatch-flatly} was used for the base styling.  Webpack~\autocite{webpack}
-was used to \gls{transpile} TypeScript down to JavaScript --- minifying and uglifying it in the
-process --- and concatenate all source files and their dependencies into one main JavaScript
-\textit{bundle} file. \textit{\Gls{minification}} of JavaScript assets involves stripping out all
-unnecessary whitespace and tokens. \textit{\Gls{uglification}} transforms the JavaScript code by
-renaming all variables and functions into short, obfuscated names to reduce the footprint of the
-assets. These two techniques can decrease loading times of web apps as the browser have smaller
-asset payloads to download than the original, raw source code.
+For further assets, Sass~\autocite{sass-lang} (a CSS extension language) was used as a CSS
+pre-processor and Bootswatch~\autocite{bootswatch-flatly} (a predefined CSS theme) was used for the
+base styling.  Webpack~\autocite{webpack} was used to compile TypeScript down to JavaScript ---
+minifying and uglifying it in the process --- and to concatenate all source files and their
+dependencies into one main JavaScript file. \textit{\Gls{minification}} of JavaScript assets
+involves stripping out all unnecessary whitespace and tokens.  \textit{\Gls{uglification}}
+transforms the JavaScript code by renaming all variables and functions into short, obfuscated names
+to reduce the footprint of the assets. These two techniques can decrease loading times of web apps
+as the browser has to download smaller asset resources than the original, raw source code.
 
 \subsection{Development Dependencies}%
 \label{sub:development_dependencies}
 
-To maintain code readability and prevent bugs, TSLint~\autocite{tslint} was used and set up to
+To maintain code quality, TSLint~\autocite{tslint} (a TypeScript code linter) was used and set up to
 automatically run as part of the Travis \gls{ci}~\autocite{travis} service, causing a build to fail
 if the linter detected a style violation. For unit testing, Jest~\autocite{jest} (with
 ts-jest~\autocite{ts-jest} for TypeScript support) was used, especially for its powerful mocking
@@ -420,12 +436,12 @@ TypeDoc~\autocite{typedoc}.
 \section{Iterative Design}%
 \label{sec:iterative_design}
 
-Iterative design was used as the design process for writing the code for this project. Iterative
-design is a cyclical process of designing, prototyping and evaluating. One designs and prototypes a
-new feature before evaluating the final feature design. If the design is acceptable, the new
-feature is implemented, otherwise the cycle restarts. An iterative design process allows to address
-different functionality as separate tasks, building on top of one another. It also allows to
-heavily refactor a project whilst staying in one cycle.
+An iterative design was used for writing the code for this project. Iterative design is a cyclical
+process of designing, prototyping and evaluating. One designs and prototypes a new feature before
+evaluating the final feature design. If the design is acceptable, the new feature is implemented,
+otherwise the cycle restarts. An iterative design process enables one to address different functionality
+as separate tasks, building on top of one another. It also allows heavy refactors of a project
+whilst staying in one cycle.
 
 \chapter{Implementation}%
 \label{cha:implementation}
@@ -436,17 +452,15 @@ heavily refactor a project whilst staying in one cycle.
 \subsection{First Design Iteration}%
 \label{sub:first_design_iteration}
 
-The first design iteration had a specific focus on basic \charge{} drawing, with a plan to begin a
-second iteration for adding quarterly rendering with lessons learnt from implementing \charge{}
-drawing in the first iteration. The second design iteration is described in
-Section~\ref{sub:second_design_iteration}.
+The first design iteration had a specific focus on basic \charge drawing, with a plan to begin a
+second iteration for adding quarterly rendering with lessons learnt from this iteration.
 
 I decided to have all drawing logic defined in the client, existing in a single module with minimum
 dependencies. The shield outline was rendered on the page on load as part of the HTML template.
 This helped support a reliable entry point for the drawing logic as it was able to easily select
-the shield element to begin appending other \svg{} elements to. Appending these \svg{} elements
-allowed layering to be achieved as \svg{} orders layers based on the order of elements in the
-document. This was used to great effect later when drawing quarters (see
+the shield element to begin appending other \svg elements to. Appending these \svg elements
+allowed layering to be achieved as \svg orders layers based on the order of elements in the
+document. This was used to great effect when drawing quarters (see
 Section~\ref{sub:second_design_iteration}).
 
 The front-end was designed around functional paradigms; breaking up major functionality into
@@ -454,79 +468,114 @@ functions that would deal with smaller, encapsulated functionality, such as addi
 the HTML template or clearing the shield when drawing a new \blazon. This allowed for a stable API,
 as the single point of access function would not be renamed but all other functions may be changed
 and updated separately. As described in Section~\ref{sec:core_concepts}, the front-end first
-accessed the \textit{field} value in the parsed JSON \payload, applied the value as the CSS class
-for the shield and then moved onto the \charges{}. It iterated over the \textit{\charges{}} array
-in the \payload, drawing each \charge{} onto the shield and applying the tincture as the CSS class.
-Due to \svg{} layering, as mentioned earlier, if there were multiple \charges{} specified in the
-\payload, all would be drawn according to the array ordering.
+accessed the \texttt{field} value in the parsed JSON response, applied the value as the CSS class
+for the shield and then moved onto the \charges. It iterated over the \texttt{\charges} array in
+the JSON response, drawing each \charge onto the shield and applying the tincture as the CSS class.
+Due to \svg layering, as mentioned earlier, if there were multiple \charges specified in the
+response, all would be drawn according to the array ordering.
 
 \subsection{First Design Implementation}%
 \label{sub:first_design_implementation}
 
 As described in Section~\ref{sub:first_design_iteration}, the initial approach was to have all methods in
-the core \texttt{index.ts} file that would be \gls{transpile}d and loaded in the browser. This
+the core \texttt{index.ts} file that would be compiled and loaded in the browser. This
 meant a smaller footprint when the code was bundled by Webpack and easier maintenance as all
 relevant functions were next to one another, following the Step-Down
 Rule~\autocite{martin2009clean}\footnote{The Step-Down Rule dictates that if function \texttt{A()}
-calls function \texttt{B()} and \texttt{C()} in its function body, functions \texttt{A()} and
-\texttt{B()} should be defined immediately after function \texttt{A()}.}.
+calls function \texttt{B()} and \texttt{C()} in its function body, functions \texttt{B()} and
+\texttt{C()} should be defined immediately after function \texttt{A()}.}.
 
 \subsubsection{\texttt{drawShield(\blazon)}}%
 \label{ssub:draw_shield}
 
 The web app had a single entry point of \texttt{drawShield(\blazon)}, where \texttt{\blazon} was
-the whole JSON \payload returned from the \texttt{/\_parse} endpoint. (See
-Figure~\ref{fig:expected_output} for an example \payload.) This presented a problem initially as
-TypeScript didn't handle the unstructured parsed data well due to it being a JavaScript
+the whole JSON \payload returned from the \texttt{/\_parse} endpoint (see
+Figure~\ref{fig:expected_output} for an example JSON response). This presented a problem initially
+as TypeScript didn't handle the unstructured parsed data well due to it being a JavaScript
 \texttt{Object}\footnote{In JavaScript, an \texttt{Object} works as both an associative array and a
 basis for classes and inheritance through its \texttt{prototype} field.} instance. Attempting to
 access members of this object (such as \texttt{\gls{field}}) causes TypeScript to produce an error
 that the contents might be undefined and thus return a \texttt{null} object. To fix this, I
 designed \texttt{interface}s with the expected fields in the \payload; one for the whole object,
-\texttt{IBlazon}, and one for the \charges{} array contained within, \texttt{ICharge}. Similarly,
-to avoid problems with string matching, I defined 2 \texttt{enum}s to represent the supported
-tinctures and \charges{}, \texttt{ETincture} and \texttt{ECharge} respectively. As discussed in
+\texttt{IBlazon}, and one for the \charges array contained within, \texttt{ICharge}. Similarly, to
+avoid problems with string matching, I defined 2 \texttt{enum}s to represent the supported
+tinctures and \charges, \texttt{ETincture} and \texttt{ECharge} respectively. As discussed in
 Section~\ref{sec:adding_quarterly_rendering}, I later added another \texttt{enum} for quarters.
-(All \texttt{interface}s and \texttt{enum}s can be found in
-Appendix~\ref{cha:interfaces_and_enums}.) Having fixed this data problem,
-\texttt{drawShield(\blazon)} was now able to access members of the \blazon object safely.
+All \texttt{interface}s and \texttt{enum}s can be found in Appendix~\ref{cha:interfaces_and_enums}.
+Having fixed this data problem, \texttt{drawShield(\blazon)} was now able to access members of the
+\blazon object safely.
 
 \subsubsection{\texttt{clearShield()}}%
 \label{ssub:clear_shield}
 
-To avoid the problem of overlapping \charges{}, I had to write a \texttt{clearShield()} method that
-would iterate over all the \texttt{path} nodes in the \svg{} document, and delete them. This,
+To avoid the problem of overlapping \charges, I had to write a \texttt{clearShield()} method that
+would iterate over all the \texttt{path} nodes in the \svg document, and delete them. This,
 however, promptly deleted the shield outline, so I had to add a check to prevent deleting
 \texttt{path} nodes with a \texttt{\#shield} id, instead only removing the CSS class. Having
 cleared the shield of any possible obstructions, the \texttt{drawShield} method would then assign
-the contents of the \texttt{field} value as the CSS class and iterate over the \texttt{\charges{}}
-array, passing each \charge{} to \texttt{drawCharge(charge:~ICharge)}.
+the contents of the \texttt{field} value as the CSS class and iterate over the \texttt{\charges}
+array, passing each \texttt{\charge} to \texttt{drawCharge(charge: ICharge)}.
 
 \subsubsection{\texttt{drawCharge()} and \texttt{ChargeShapes}}%
 \label{ssub:draw_charge}
 
-When each \charge{} node is created in \texttt{drawCharge}, it is assigned an id. This id is formed
+When each \charge node is created in \texttt{drawCharge}, it is assigned an id. This id is formed
 from the name of the charge, followed by a random number in the range $1\text{--}512$ inclusive
-with the hope that the range is large enough to lack overlaps.
+with the hope that the range is large enough to lack overlaps. This was later changed to rely on a
+cryptographically secure, random number generator.
 
-To draw shapes in \svg{}, a \texttt{path} node requires a `\texttt{d}' attributes which contains
-the commands for drawing said shape. To generate all these attributes, I drew all the \charge{}
-shapes in Inkscape and extracted the `\texttt{d}' attribute from the generated \svgs{}. At first, I
-put a \texttt{Map}\footnote{A \texttt{Map} here is a TypeScript/JavaScript data type, also known as
-a \texttt{HashMap} or an associative array} of the \charges{} and their paths in the global scope,
-available for all functions to access. This worked for \charges{} that were produced using a
+To draw shapes in \svg a \texttt{path} node requires a `\texttt{d}' attribute which contains the
+commands for drawing said shape. To generate all these attributes, I drew all the \charge shapes in
+Inkscape and extracted the `\texttt{d}' attributes from the generated \svgs. At first, I put a
+\texttt{Map}\footnote{A \texttt{Map} here is a TypeScript/JavaScript data type, also known as a
+\texttt{HashMap} or an associative array.} of the \charges and their paths in the global scope,
+available for all functions to access. This worked for \charges that were produced using a
 \texttt{path} node with a `\texttt{d}' attribute, but introduced problems when using the
-\textit{chief} \charge{} (a chief \charge{} being displayed in Figure~\ref{fig:chief_example}). The
-chief \charge{} was drawn using a \texttt{rect} node which required `\texttt{x}' and `\texttt{y}'
+chief \charge (a chief \charge being displayed in Figure~\ref{fig:chief_example}). The
+chief \charge was drawn using a \texttt{<rect>}\footnote{A \texttt{<rect>} node in \svg is used for
+drawing rectangular shapes.} node which required `\texttt{x}' and `\texttt{y}'
 co-ordinates to specify a starting point and \texttt{height} and \texttt{width} attributes to
 describe the size of the rectangle. To address this, I wrote a \texttt{ChargeShapes} class to
-encapsulate the \charges{} and their attributes. This class provided one public member,
-\texttt{chargePaths} which was of the type \texttt{Map<string, Map<string, string>\hphantom{}>}.
+encapsulate the \charges and their attributes. This class provided one public member,
+\texttt{chargePaths} which was of the type \texttt{Map<string, Map<string, string>\hphantom>}.
 Having this as a map allowed \texttt{drawCharge} to first check if the app knew how to draw the
-\charge{} by checking whether \texttt{ChargeShapes.chargePaths} contained the \charge{} as a key.
-If the \charge{} had an entry, then \texttt{drawCharge} would iterate over the attribute
-\texttt{Map} and apply them to the \texttt{path} or \texttt{rect} node, before finally applying the
-CSS class.
+\charge by checking whether \texttt{ChargeShapes.chargePaths} contained the \charge as a key.  If
+the \charge had an entry, then \texttt{drawCharge} would iterate over the attribute \texttt{Map}
+and apply them to the \texttt{path} or \texttt{rect} node, before finally applying the CSS class.
+
+A visual representation of \texttt{drawCharge}'s execution may be seen in
+Figure~\ref{fig:draw_charge}.
+
+\begin{figure}
+  \centering
+  \subfloat[Initial \gls{escutcheon} outline on the webpage.]{%
+    \def\svgwidth{0.45\linewidth}%
+    \input{graphics/charge_renderer_process/draw_charge_stage0.pdf_tex}
+  }
+  \qquad
+  \subfloat[First stage: applying the \texttt{field} CSS class.]{%
+    \def\svgwidth{0.45\linewidth}%
+    \input{graphics/charge_renderer_process/draw_charge_stage1.pdf_tex}
+  }
+  \\
+  \subfloat[Second stage: drawing the charge onto shield.]{%
+    \def\svgwidth{0.45\linewidth}%
+    \input{graphics/charge_renderer_process/draw_charge_stage2.pdf_tex}
+  }
+  \qquad
+  \subfloat[Final stage: applying the \texttt{tincture} CSS class on charge.]{%
+    \def\svgwidth{0.45\linewidth}%
+    \input{graphics/charge_renderer_process/draw_charge_stage3.pdf_tex}
+  }
+  \caption{The process of \texttt{drawCharge()} rendering a Scrope \gls{escutcheon}.}%
+  \label{fig:draw_charge}
+\end{figure}
+
+The final part of \texttt{drawCharge} applied a transform to the \texttt{path} if the JSON response
+included a boolean flag, \texttt{sinister}, to indicate that the bend \charge should be flipped.
+This writes to an attribute \texttt{transform} which applies a \texttt{matrix} transformation that
+flips the \charge followed by a \texttt{translate} transformation to move it into place. An
+example of a sinister bend can be seen in Figure~\ref{fig:sinister_example}.
 
 \begin{marginfigure}
   \centering
@@ -535,18 +584,13 @@ CSS class.
   \caption{\textit{Or, a bend sinister Vert.}}\label{fig:sinister_example}
 \end{marginfigure}
 
-The final part of \texttt{drawCharge} applied a transform to the \texttt{path} if the \payload
-included a boolean flag \texttt{sinister} to indicate that the bend \charge{} should be flipped.
-This writes to an attribute \texttt{transform} which applies a \texttt{matrix} transformation that
-flips the \charge{} followed by a \texttt{translate} transformation to move it into place. An
-example of a sinister bend can be seen in Figure~\ref{fig:sinister_example}.
-
 \subsection{First Design Evaluation}%
 \label{sub:first_design_evaluation}
 
 Whilst this simple implementation worked well for drawing basic \glspl{escutcheon}, like
 Figure~\ref{fig:chief_example} and Figure~\ref{fig:sinister_example}, it wasn't able to draw more
-complex shields like those seen in Figure~\ref{fig:complex_shields}.
+complex shields like those seen in Figure~\ref{fig:complex_shields} and thus was not meeting the
+project aims.
 
 \section{Adding Quarterly Rendering}%
 \label{sec:adding_quarterly_rendering}
@@ -586,25 +630,24 @@ names and well-defined, shared APIs.
 
 The new design had a top-level class of \texttt{\ublazon} which had a single public function,
 \texttt{draw()}. The \texttt{draw} method, as before, would clear the shield and then delegate
-drawing responsibility to specialised \texttt{\charge{}} and \texttt{\quarter{}} renderers by
-calling their \texttt{draw()} methods. This \texttt{\ublazon} class became the new entry-point,
-being instantiated and called in a \texttt{main()} function in \texttt{index.ts}. In a similar
-fashion to the top-level \texttt{\ublazon} class, a \texttt{\Gls{quarter}} class was defined to
-enable proper delegation for rendering both the \quarter \textit{and} the \charges contained within
-the quarter. The new \texttt{ChargeRenderer} class would contain most major logic for drawing, as
-well as \texttt{id} generation. \texttt{QuarterRenderer} extended \texttt{ChargeRenderer} to add
+drawing responsibility to specialised \texttt{\charge} and \texttt{\quarter} renderers by calling
+their \texttt{draw()} methods. This \texttt{\ublazon} class became the new entry-point, being
+instantiated and called in a \texttt{main()} function in \texttt{index.ts}. In a similar fashion to
+the top-level \texttt{\ublazon} class, a \texttt{\Gls{quarter}} class was defined to enable proper
+delegation for rendering both the \quarter \textit{and} the \charges contained within the quarter.
+The new \texttt{ChargeRenderer} class would contain most major logic for drawing, as well as
+\texttt{id} generation. \texttt{QuarterRenderer} extended \texttt{ChargeRenderer} to add
 \quarter-specific logic, while also being able to call up to it to draw the contained \charges.
 
 For a quarterly \blazon, the \payload would have the \texttt{\gls{field}} value set to
-\texttt{``quarterly''} and rather having a field \texttt{charges:~ICharge[]}, it would contain a
-field \texttt{quarters:~IBlazon[]}. This worked as \quarters are treated as their own small
+\texttt{``quarterly''} and rather then having a field \texttt{charges: ICharge[]}, it would contain
+a field \texttt{quarters: IBlazon[]}. This worked as \quarters are treated as their own small
 \glspl{escutcheon} in heraldry and are described as such. An example of a quarterly \blazon would
 be \textit{Quarterly: 1st and 4th: Gules, a bend Sable; 2nd and 3rd: Azure, a chief Or}, as seen in
 Figure~\ref{fig:complex_shields}. It was then possible to change functionality of the app depending
 on the contents of the \texttt{field} key. To account for the new quarters that needed to be drawn,
-a new \texttt{enum} \texttt{EQuarter} was designed, with the values of the enumerable options being
-the \texttt{id}s of the \svg elements and the \texttt{path}s in the
-\texttt{ChargeShapes.chargePaths} \texttt{Map}.
+a new \texttt{enum} \texttt{EQuarter} was designed, with the members being the positions of the
+\svg elements and the \texttt{path}s in the \texttt{ChargeShapes.chargePaths} \texttt{Map}.
 
 \subsubsection{Using \svgs for Great Good}%
 \label{ssub:using_svg_for_great_good}
@@ -629,23 +672,25 @@ Appendix~\ref{sec:second_design_iteration_diagrams}.
 \subsubsection{\texttt{Blazon} (Figure~\ref{fig:BlazonUML})}%
 \label{ssub:blazon}
 
-\texttt{\ublazon} took 2 arguments in its \texttt{constructor}, \texttt{svg} and \texttt{data}.
+\texttt{\ublazon} took 2 arguments in its \texttt{constructor}: \texttt{svg} and \texttt{data}.
 \texttt{svg} was a D3.js~\autocite{d3js} data type that contained a selector for the \texttt{<svg>}
-element in the HTML document, for appending elements to. The \texttt{data} argument was to take the
-full JSON \payload returned by the parser. The \texttt{constructor} would then turn the
-\texttt{data} \texttt{Object} into a \texttt{Map} object for more reliable access. To get more
-fine-grained access to the \svg document, the \texttt{constructor} also populated extra fields with
-selections of the whole shield element and the \texttt{<g id=``charge\_layers''>} element, defined
-within the \texttt{svg} selection. The \texttt{chargesLayer} field is needed for telling the
-renderer classes where to draw their shapes.  Depending on the contents of the \payload, the
-\texttt{constructor} then instantiates new \texttt{ChargeRenderer} objects for all the
-\texttt{\charges}, or instantiates 4 new \texttt{Quarter} objects for all the \quarters.
+element in the HTML document, for appending elements to. This data type is henceforth referred to
+as \texttt{d3.Selection}. The \texttt{data} argument was to take the full JSON \payload returned by
+the parser. The \texttt{constructor} would then turn the \texttt{data} \texttt{Object} into a
+\texttt{Map} object for more reliable access. To get more fine-grained access to the \svg document,
+the \texttt{constructor} also populated extra fields with selections of the whole shield element
+and the \texttt{<g id=``charge\_layers''>} element, defined within the \texttt{svg} selection. The
+\texttt{chargesLayer} field is needed for telling the renderer classes where to draw their shapes.
+Depending on the contents of the \payload, the \texttt{constructor} then instantiated new
+\texttt{ChargeRenderer} objects for all the \texttt{\charges}, or instantiated 4 new
+\texttt{Quarter} objects for all the \quarters.
 
-\texttt{clearShield} was also extracted from \texttt{index.ts} into \texttt{Blazon}, but with
-changes to account for many \texttt{<path>} nodes as well as \texttt{<clipPath>} elements. The
-method now iterated over both child elements of the \texttt{<g id=``charge\_layers''>} and
-\texttt{<clipPaths>} with an \texttt{id} beginning with \texttt{``quarterly\_''}, deleting them in
-the process. It also stripped the \texttt{shield} node of its CSS class.
+\texttt{clearShield} was extracted from \texttt{index.ts} into \texttt{Blazon}, but with changes to
+account for many \texttt{<path>} nodes as well as \texttt{<clipPath>} elements. The method now
+iterated over child elements of the \texttt{<g id=``charge\_layers''>}, which were \texttt{<g>},
+\texttt{<path>} and \texttt{<rect>} nodes, and \texttt{<clipPaths>} with an \texttt{id} beginning
+with \texttt{``quarterly\_''}, deleting them in the process. It also stripped the \texttt{shield}
+node of its CSS class.
 
 \subsubsection{\texttt{Quarter} (Figure~\ref{fig:QuarterUML})}%
 \label{ssub:quarter}
@@ -653,7 +698,7 @@ the process. It also stripped the \texttt{shield} node of its CSS class.
 The new \texttt{Quarter} class relied on the order of the \texttt{quarters} array in the payload to
 determine which quarter it was representing; with numbering starting at 0 in the top left quarter,
 going left to right, ending at 3 in the bottom right. The \texttt{constructor} required the array
-index as its first argument, with \texttt{field:~ETincture}, \texttt{charges:~ICharge[]},
+index as its first argument, with \texttt{field: ETincture}, \texttt{charges: ICharge[]},
 \texttt{svg} and \texttt{chargesLayer} as its other arguments. With these parameters, the
 \texttt{constructor} selected the quarter specified by the \texttt{index}, instantiated
 \texttt{ChargeRenderer} objects --- borrowing a method from \texttt{Blazon} --- and a
@@ -671,7 +716,7 @@ instruct the \charge to render in the \quarter.
 \label{ssub:charge_renderer}
 
 The \texttt{constructor} for \texttt{ChargeRenderer} expected a \texttt{chargesLayer}, a
-\texttt{tincture:~ETincture}, a \texttt{charge:~ECharge | EQuarter} and a \texttt{sinister:
+\texttt{tincture: ETincture}, a \texttt{charge: ECharge | EQuarter} and a \texttt{sinister:
 boolean} argument. The \texttt{tincture} argument was used by both the \texttt{ChargeRenderer}
 itself and the \texttt{QuarterRenderer}, for the colour of the \charge and \gls{field}
 respectively. The union type signature of \texttt{charge} allowed it to draw both \charges and
@@ -679,7 +724,7 @@ respectively. The union type signature of \texttt{charge} allowed it to draw bot
 function from the \texttt{index.ts} file into the \texttt{ChargeRenderer} \texttt{draw()} method.
 However, in trying to keep extensibility from \texttt{ChargeRenderer} to \texttt{QuarterRenderer},
 the logic was then extracted from the \texttt{draw} method into its own protected
-\texttt{drawCharge(}\texttt{currentCharge:~d3.Selection,} \texttt{chargeLayer?:~d3.Selection)}
+\texttt{drawCharge(}\texttt{currentCharge: d3.Selection,} \texttt{chargeLayer?: d3.Selection)}
 method. This freed up the \texttt{draw} method to handle setting up the \svg document for the
 \quarters and \charges to be drawn into, as well as applying clip paths.
 
@@ -695,7 +740,7 @@ into \texttt{ChargeRenderer} for \texttt{id} generation.
 
 \texttt{QuarterRenderer} extended \texttt{ChargeRenderer}, with few changes to what it inherited.
 In the \texttt{constructor}, rather than generating a random \texttt{id} for the quarter, it used
-the \texttt{charge:~ECharge | EQuarter} parameter (that would be a member of \texttt{EQuarter} in
+the \texttt{charge: ECharge | EQuarter} parameter (that would be a member of \texttt{EQuarter} in
 this case). A new method \texttt{addClipPathDefinition(svg)} was also added. In \svg documents,
 clip paths are defined using \texttt{<clipPath>} elements inside a \texttt{<defs>} element at the
 top of the document. The \texttt{addClipPathDefinition} method selected the \texttt{<defs>} element
@@ -705,19 +750,34 @@ the inherited \texttt{drawCharge} method.
 \subsection{Second Design Evaluation}%
 \label{sub:second_design_evaluation}
 
-\begin{marginfigure}
-  \centering
-  \def\svgwidth{0.8\linewidth}
-  \input{graphics/second_iteration_quarterly.pdf_tex}
-  \caption{The second iteration rendering of Figure~\ref{fig:complex_shields}}%
-  \label{fig:second_iteration_quarterly}
-\end{marginfigure}
-
 This design iteration had brought quarterly rendering a lot closer to fruition, as seen in
-Figure~\ref{fig:second_iteration_quarterly}, but I had difficulties maintaining clean code whilst
+Figure~\ref{fig:second_iteration_progress}, where  but I had difficulties maintaining clean code whilst
 adding the functionality to apply quarter-specific transformations to scale and move \charges. To
 add this, I had to redesign both how \texttt{ChargeShapes} and how both \texttt{Renderer} classes
 worked.
+
+This design iteration had brought quarterly rendering a lot closer to fruition, as seen in
+Figure~\ref{fig:second_iteration_progress}, however proper scaling and translation of charges was
+yet to be implemented. The project aims were yet to be realised. In prototyping to add the
+functionality to apply quarter-specific transformations, I had difficulties maintaining clean,
+extensible code. To both satisfy the project aims and the code standards, I had to redesign how
+\texttt{ChargeShapes} and both \texttt{Renderer} classes worked.
+
+\begin{figure}
+  \centering
+  \subfloat[The expected output for the blazon \textit{Quarterly: 1st and 4th: Gules, a bend
+  Sable; 2nd and 3rd: Azure, a chief Or}.]{%
+    \def\svgwidth{0.4\linewidth}
+    \input{graphics/quarterly_example.pdf_tex}%
+  }
+  \qquad
+  \subfloat[The second iteration output of this blazon.]{%
+    \def\svgwidth{0.4\linewidth}%
+    \input{graphics/second_iteration_quarterly.pdf_tex}
+  }
+  \caption{Second iteration progress.}%
+  \label{fig:second_iteration_progress}
+\end{figure}
 
 %\subsection{SOLID Design Principles}%
 %\label{sub:solid_design_principles}
@@ -764,9 +824,11 @@ function, but also gave child classes the shared functions that both required wh
 to specialise in their individual use cases. It also meant that previously ambiguous attribute
 names could be named more specifically for the particular \texttt{Renderer} implementation. An
 example of this being that where \texttt{ChargeRenderer} previously had an attribute of
-\texttt{charge} with a union type of \texttt{ECharge~|~EQuarter}, the \texttt{charge} attribute
+\texttt{charge} with a union type of \texttt{ECharge | EQuarter}, the \texttt{charge} attribute
 could now have a type of just \texttt{ECharge} and \texttt{QuarterRenderer} could have an attribute
 of \texttt{quarter} with type \texttt{EQuarter}.
+
+The planned execution for this design may be seen in Figure~\ref{fig:quarter_rendering}.
 
 \subsubsection{\texttt{ChargeShapes} and \texttt{QuarterShapes} Abstraction}%
 \label{ssub:chargeshape_and_quartershape_abstraction}
@@ -774,11 +836,11 @@ of \texttt{quarter} with type \texttt{EQuarter}.
 In a similar fashion to the \texttt{Renderer} redesign, I devised a new design for the attributes
 and transforms for \texttt{ChargeShapes}. Rather than having all paths defined in a \texttt{Map} in
 the \texttt{ChargeShapes}, a new abstract class, \texttt{AShape}, would be defined with a
-\texttt{dimensions} \texttt{Map} and a \texttt{transforms(transform:~string):~string} method. Each
+\texttt{dimensions} \texttt{Map} and a \texttt{transforms(transform: string): string} method. Each
 charge then extended \texttt{AShape}, implemented the two abstract properties and was imported by
 the \texttt{ChargeShapes} class. The \texttt{ChargeShapes} was redesigned to have a boolean
-function, \texttt{hasChargePath(charge:~string)} to check if it knew the given charge.
-\texttt{ChargeShapes} also had a static function, \texttt{chargeShapes(charge:~ECharge)} which
+function, \texttt{hasChargePath(charge: string)} to check if it knew the given charge.
+\texttt{ChargeShapes} also had a static function, \texttt{chargeShapes(charge: ECharge)} which
 returned an instance of \texttt{AShape}. This design makes use of the \textit{Dependency Inversion}
 principle~\autocite{martin2000design}, which says that a class should depend on abstractions,
 rather than concretions. In this case, when renderers call out to \texttt{ChargeShapes} for the
@@ -792,6 +854,46 @@ hierarchy. \texttt{AQuarterShape} only exposed a \texttt{dimensions} \texttt{Map
 
 %Dependency Inversion - \texttt{AShape}, \texttt{AQuarterShape}
 
+\begin{figure}
+  \centering
+  \subfloat[Initial \gls{escutcheon} outline on the webpage.]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/quarter_renderer_process/stage0.pdf_tex}
+  }
+  \qquad
+  \subfloat[Drawing on the quarter shape.]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/quarter_renderer_process/stage1.pdf_tex}
+  }
+  \\
+  \subfloat[Applying the \texttt{field} CSS class.]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/quarter_renderer_process/stage2.pdf_tex}
+  }
+  \qquad
+  \subfloat[Drawing on the charge shape.]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/quarter_renderer_process/stage3.pdf_tex}
+  }
+  \\
+  \subfloat[Applying the \texttt{tincture} CSS class.]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/quarter_renderer_process/stage4.pdf_tex}
+  }
+  \qquad
+  \subfloat[Applying the scaling transformation to the charge.]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/quarter_renderer_process/stage5.pdf_tex}
+  }
+  \\
+  \subfloat[Applying the clip path to the charge.]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/quarter_renderer_process/stage6.pdf_tex}
+  }
+  \caption{The process of the \texttt{Quarter} class rendering a quarter with a bend in it.}%
+  \label{fig:quarter_rendering}
+\end{figure}
+
 \subsection{Third Design Implementation}%
 \label{sub:third_design_implementation}
 
@@ -802,7 +904,7 @@ Appendix~\ref{sec:third_design_iteration_diagrams}.
 \label{ssub:renderer}
 
 The new \texttt{Renderer} class contained 3 protected, inherited attributes, \texttt{chargeId:
-string}, \texttt{tincture:~ETincture} and \texttt{parentChargesLayer: d3.Selection}. Whilst the
+string}, \texttt{tincture: ETincture} and \texttt{parentChargesLayer: d3.Selection}. Whilst the
 clas had 3 attributes, only \texttt{tincture} and \texttt{parentChargesLayer} were assigned in the
 constructor; inherited classes were given responsibility of generating their own \texttt{id}s. As
 mentioned in Section~\ref{sub:third_design_iteration}, \texttt{Renderer} defined an abstract method
@@ -853,13 +955,13 @@ Having extracted all the previous dimensions into their own classes, \texttt{Cha
 provided a single point-of-access for all \charges. It had a private, static array containing the
 names of each imported \charge. To check whether the \charge could be drawn, it exposed a boolean
 function, \texttt{hasChargePath(charge: string)} that scanned over the array to check whether the
-argument given to it was contained within. A new function \texttt{chargeShapes(charge:~ECharge)}
+argument given to it was contained within. A new function \texttt{chargeShapes(charge: ECharge)}
 was defined to replace the newly-removed \texttt{chargePaths} \texttt{Map} which returned a new
 object for the relevant \texttt{AShape}. When the \texttt{ChargeRenderer} called this, it was then able to
 chain methods together without concerns about which \texttt{AShape} it had been given.
 
 Again, to mirror the new \texttt{ChargeShapes} implementation, \texttt{QuarterShapes} was also
-defined with a sole \texttt{quarterShapes(quarter:~EQuarter)} which returned a new object for the
+defined with a sole \texttt{quarterShapes(quarter: EQuarter)} which returned a new object for the
 relevant \texttt{AQuarterShape}. The implementations for both \texttt{QuarterShapes} and
 \texttt{AQuarterShape} were unnecessarily verbose, but were done purposefully to be keep the code
 open-ended and extensible for future functionality.
@@ -910,7 +1012,6 @@ examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shield
 \printbibliography[heading=bibintoc]
 
 \printglossary%
-\label{glossary}
 
 \input{appendix.tex}
 
