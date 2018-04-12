@@ -108,8 +108,7 @@
 are the text describing how shields in coats of arms are to be drawn. Through use of good software
 engineering principles, such as decoupling and delegation, I built a modular system that
 rendered the blazons with scope for further extension in the future. When comparing against a
-similar system, it had significantly better performance with more features. Due to time constraints,
-the system was not fully fault-tolerant and had difficulties processing malformed requests.}
+similar system, it had significantly better performance with more features.}
 
 \begin{publicationmeta}
   \section*{Acknowledgements}
@@ -468,24 +467,24 @@ extensive refactors of a project whilst staying within one cycle.
 \section{Basic Charge Rendering}%
 \label{sub:basic_charge_rendering}
 
-\subsection{First Design Iteration}%
+\subsection{Design}%
 \label{sub:first_design_iteration}
 
-The first design iteration had a specific focus on basic \charge drawing, with a plan to begin a
-second iteration for adding quarterly rendering with lessons learnt from this iteration.
+The first design iteration had a specific focus on basic \charge drawing.  The second iteration for
+adding quarterly rendering, would be drawn up based on the results from this iteration.
 
 I decided to have all drawing logic defined in the client, existing in a single module with minimum
 dependencies. The shield outline was rendered on the page on load as part of the HTML template.
-This helped support a reliable entry point for the drawing logic as it was able to easily select
-the shield element to begin appending other \svg elements to. Appending these \svg elements
-allowed layering to be achieved as \svg orders layers based on the order of elements in the
-document. This was used to great effect when drawing quarters (see
+This supported a reliable entry point for the drawing logic as selecting the shield element was
+straightforward. Having selected the element, the web app could begin appending other \svg elements
+to it and enabled layering to be achieved. This is due to \svg ordering layers based on the order
+of elements in the document. This was used to great effect when drawing quarters (see
 Section~\ref{sub:second_design_iteration}).
 
 The front-end was designed around functional paradigms; breaking up major functionality into
 functions that would deal with smaller, encapsulated functionality, such as adding extra layers to
 the HTML template or clearing the shield when drawing a new \blazon. This allowed for a stable API,
-as the single point of access function would not be renamed but all other functions may be changed
+as the single point of access function would not be renamed, but all other functions may be changed
 and updated separately. As described in Section~\ref{sec:core_concepts}, the front-end first
 accessed the \texttt{field} value in the parsed JSON response, applied the value as the CSS class
 for the shield and then moved onto the \charges. It iterated over the \texttt{\charges} array in
@@ -493,7 +492,7 @@ the JSON response, drawing each \charge onto the shield and applying the tinctur
 Due to \svg layering, as mentioned earlier, if there were multiple \charges specified in the
 response, all would be drawn according to the array ordering.
 
-\subsection{First Design Implementation}%
+\subsection{Implementation}%
 \label{sub:first_design_implementation}
 
 As described in Section~\ref{sub:first_design_iteration}, the initial approach was to have all methods in
@@ -509,15 +508,15 @@ calls function \texttt{B()} and \texttt{C()} in its function body, functions \te
 
 The web app had a single entry point of \texttt{drawShield(\blazon)}, where \texttt{\blazon} was
 the whole JSON \payload returned from the \texttt{/\_parse} endpoint (see
-Figure~\ref{fig:expected_output} for an example JSON response). This presented a problem initially
+Figure~\ref{fig:expected_output} for an example JSON response). Initially this presented a problem
 as TypeScript didn't handle the unstructured parsed data well due to it being a JavaScript
 \texttt{Object}\footnote{In JavaScript, an \texttt{Object} works as both an associative array and a
 basis for classes and inheritance through its \texttt{prototype} field.} instance. Attempting to
-access members of this object (such as \texttt{\gls{field}}) causes TypeScript to produce an error
+access members of this object (such as \texttt{\gls{field}}) caused TypeScript to produce an error
 that the contents might be undefined and thus return a \texttt{null} object. To fix this, I
 designed \texttt{interface}s with the expected fields in the \payload; one for the whole object,
 \texttt{IBlazon}, and one for the \charges array contained within, \texttt{ICharge}. Similarly, to
-avoid problems with string matching, I defined 2 \texttt{enum}s to represent the supported
+avoid problems with string matching, I defined a pair of \texttt{enum}s to represent the supported
 tinctures and \charges, \texttt{ETincture} and \texttt{ECharge} respectively. As discussed in
 Section~\ref{sec:adding_quarterly_rendering}, I later added another \texttt{enum} for quarters.
 All \texttt{interface}s and \texttt{enum}s can be found in Appendix~\ref{cha:interfaces_and_enums}.
@@ -538,29 +537,29 @@ array, passing each \texttt{\charge} to \texttt{drawCharge(charge: ICharge)}.
 \subsubsection{\texttt{drawCharge()} and \texttt{ChargeShapes}}%
 \label{ssub:draw_charge}
 
-When each \charge node is created in \texttt{drawCharge}, it is assigned an id. This id is formed
-from the name of the charge, followed by a random number in the range $1\text{--}512$ inclusive
-with the hope that the range is large enough to lack overlaps. This was later changed to rely on a
-cryptographically secure, random number generator.
+When a \charge node is created in \texttt{drawCharge}, it is assigned an id. This id was formed
+from the name of the charge, followed by a random number in the range $1\text{--}512$ inclusive.
+This was later changed to rely on a cryptographically secure, random number generator, generating
+unsigned 16-bit integers.
 
 To draw shapes in \svg a \texttt{path} node requires a `\texttt{d}' attribute which contains the
-commands for drawing said shape. To generate all these attributes, I drew all the \charge shapes in
+commands for drawing that shape. To generate all these attributes, I drew all the \charge shapes in
 Inkscape and extracted the `\texttt{d}' attributes from the generated \svgs. At first, I put a
 \texttt{Map}\footnote{A \texttt{Map} here is a TypeScript/JavaScript data type, also known as a
 \texttt{HashMap} or an associative array.} of the \charges and their paths in the global scope,
 available for all functions to access. This worked for \charges that were produced using a
-\texttt{path} node with a `\texttt{d}' attribute, but introduced problems when using the
-chief \charge (a chief \charge being displayed in Figure~\ref{fig:chief_example}). The
-chief \charge was drawn using a \texttt{<rect>}\footnote{A \texttt{<rect>} node in \svg is used for
-drawing rectangular shapes.} node which required `\texttt{x}' and `\texttt{y}'
-co-ordinates to specify a starting point and \texttt{height} and \texttt{width} attributes to
-describe the size of the rectangle. To address this, I wrote a \texttt{ChargeShapes} class to
-encapsulate the \charges and their attributes. This class provided one public member,
-\texttt{chargePaths} which was of the type \texttt{Map<string, Map<string, string>\hphantom>}.
-Having this as a map allowed \texttt{drawCharge} to first check if the app knew how to draw the
-\charge by checking whether \texttt{ChargeShapes.chargePaths} contained the \charge as a key.  If
-the \charge had an entry, then \texttt{drawCharge} would iterate over the attribute \texttt{Map}
-and apply them to the \texttt{path} or \texttt{rect} node, before finally applying the CSS class.
+\texttt{path} node with a `\texttt{d}' attribute, but introduced a problem when using the chief
+\charge (a chief \charge being displayed in Figure~\ref{fig:chief_example}). The chief \charge was
+drawn using a \texttt{<rect>}\footnote{A \texttt{<rect>} node in \svg is used for drawing
+rectangular shapes.} node which required `\texttt{x}' and `\texttt{y}' co-ordinates to specify a
+starting point and \texttt{height} and \texttt{width} attributes to describe the size of the
+rectangle. To address this, I wrote a \texttt{ChargeShapes} class to encapsulate the \charges and
+their attributes. This class provided one public member, \texttt{chargePaths} which was of the type
+\texttt{Map<string, Map<string, string>\hphantom{}>}.  Representing this as a \texttt{Map} allowed
+\texttt{drawCharge} to first check if the app knew how to draw the \charge by checking whether
+\texttt{ChargeShapes.chargePaths} contained the \charge as a key.  If the \charge had an entry,
+then \texttt{drawCharge} would iterate over the attribute \texttt{Map} and apply them to the
+\texttt{path} or \texttt{rect} node, before finally applying the CSS class.
 
 A visual representation of \texttt{drawCharge}'s execution may be seen in
 Figure~\ref{fig:draw_charge}.
@@ -603,7 +602,7 @@ example of a sinister bend can be seen in Figure~\ref{fig:sinister_example}.
   \caption{\textit{Or, a bend sinister Vert.}}\label{fig:sinister_example}
 \end{marginfigure}
 
-\subsection{First Design Evaluation}%
+\subsection{Evaluation}%
 \label{sub:first_design_evaluation}
 
 Whilst this simple implementation worked well for drawing basic \glspl{escutcheon}, like
@@ -614,7 +613,7 @@ project aims.
 \section{Adding Quarterly Rendering}%
 \label{sec:adding_quarterly_rendering}
 
-\subsection{Second Design Iteration}%
+\subsection{Design}%
 \label{sub:second_design_iteration}
 
 \subsubsection{Design Principles}%
@@ -622,23 +621,19 @@ project aims.
 
 Whilst prototyping for adding functionality to render quarterly shields, I found that it was going
 to be impossible to maintain the initial, atomic design laid out in
-Section~\ref{sub:first_design_iteration} whilst also keeping the code clean and readable. This started the
-second design iteration of the project. In this iteration, I designed a new, modular system that
-leaned more heavily into Object-Oriented paradigms than functional ones. This new design was
-written to follow the principles of delegation, decoupling, the Single
+Section~\ref{sub:first_design_iteration} whilst keeping the code clean and readable. This started
+the second design iteration of the project. In this iteration, I designed a new, modular system
+that leaned more heavily into Object-Oriented paradigms than functional ones. This new design was
+written to enforce delegation and decoupling, whilst following the Single
 Responsibility~\autocite{martin2000design} and Open/Closed principles~\autocite{martin2000design}.
 
 The Single Responsibility principle dictates that a class should have one, and only one, reason to
-change. In \textit{Design Principles and Design Patterns}~\autocite{martin2000design}, Martin
-defines a responsibility as a reason to change, such that a class should only change if that one
-responsibility changes. If another responsibility is introduced, it should be given its own class.
-This principle works well with decoupling as responsibilities can be changed in individual classes
-without affecting other classes that use it. The Open/Closed principle dictates that a class should
+change. If another responsibility is introduced, it should be given its own class. This principle
+works well with decoupling as responsibilities can be changed in individual classes without
+affecting other classes that depend upon it. The Open/Closed principle dictates that a class should
 be open to extension but closed to modification. A typical example of this would be using abstract
 classes; the interface specified by the abstract class is closed to modification, but the child
-classes may extend the functionality in their implementation. Thus, another class depending on the
-class extending the abstract class can rely on the interface without having to know about the
-internals.
+classes may extend the functionality in their implementation.
 
 To comply with these principles, all major sections of functionality, including \blazon
 \payload parsing, \charge and \quarter rendering, were encapsulated in their own classes with clear
@@ -663,12 +658,13 @@ For a quarterly \blazon, the \payload would have the \texttt{\gls{field}} value 
 a field \texttt{quarters: IBlazon[]}. This worked as \quarters are treated as their own small
 \glspl{escutcheon} in heraldry and are described as such. An example of a quarterly \blazon would
 be \textit{Quarterly: 1st and 4th: Gules, a bend Sable; 2nd and 3rd: Azure, a chief Or}, as seen in
-Figure~\ref{fig:complex_shields}. It was then possible to change functionality of the app depending
-on the contents of the \texttt{field} key. To account for the new quarters that needed to be drawn,
-a new \texttt{enum} \texttt{EQuarter} was designed, with the members being the positions of the
-\svg elements and the \texttt{path}s in the \texttt{ChargeShapes.chargePaths} \texttt{Map}.
+Figure~\ref{fig:complex_shields}. The expected JSON response for this \blazon can be seen in
+Figure~\ref{fig:quarterly_json_output}. It was then possible to change functionality of the app
+depending on the contents of the \texttt{field} key. To account for the new quarters that needed to
+be drawn, a new \texttt{enum} \texttt{EQuarter} was designed, with the members being the positions
+of the \svg elements and the \texttt{path}s in the \texttt{ChargeShapes.chargePaths} \texttt{Map}.
 
-\subsubsection{Using \svgs for Great Good}%
+\subsubsection{Applying \svg Properties}%
 \label{ssub:using_svg_for_great_good}
 
 In this refactor, I also made use of more \svg properties: clip paths and the \texttt{<g>} element.
@@ -680,8 +676,59 @@ and any of its attributes are also inherited. I used the \texttt{<g>} elements f
 together charges and quarters, but also explicitly named layers for the shield outline and the
 \charges within.
 
-\subsection{Second Design Implementation}%
-\label{sub:second_design_implementation}
+\begin{figure}[h!]
+  \begin{verbatim}
+  {
+    "field": "quarterly",
+    "quarters": [
+      {
+        "field": "gules",
+        "charges": [
+          {
+            "charge": "bend",
+            "tincture": "sable"
+          }
+        ]
+      },
+      {
+        "field": "azure",
+        "charges": [
+          {
+            "charge": "chief",
+            "tincture": "or"
+          }
+        ]
+      },
+      {
+        "field": "azure",
+        "charges": [
+          {
+            "charge": "chief",
+            "tincture": "or"
+          }
+        ]
+      },
+      {
+        "field": "gules",
+        "charges": [
+          {
+            "charge": "bend",
+            "tincture": "sable"
+          }
+        ]
+      }
+    ]
+  }
+  \end{verbatim}
+  \caption{Expected JSON response from the Python back-end for a given \blazon of
+  \textit{Quarterly: 1st and 4th: Gules, a bend Sable; 2nd and 3rd: Azure, a chief Or}.}%
+  \label{fig:quarterly_json_output}
+\end{figure}
+
+\pagebreak%
+
+\subsection{Implementation}%
+\label{sub:nd_design_implementation}
 
 The Figure references in the following headings refer to the UML diagrams in
 Appendix~\ref{sec:second_design_iteration_diagrams}.
@@ -691,21 +738,20 @@ Appendix~\ref{sec:second_design_iteration_diagrams}.
 \subsubsection{\texttt{Blazon} (Figure~\ref{fig:BlazonUML})}%
 \label{ssub:blazon}
 
-\texttt{\ublazon} took 2 arguments in its \texttt{constructor}: \texttt{svg} and \texttt{data}.
+\texttt{\ublazon} took two arguments in its \texttt{constructor}: \texttt{svg} and \texttt{data}.
 \texttt{svg} was a D3.js~\autocite{d3js} data type that contained a selector for the \texttt{<svg>}
 element in the HTML document, for appending elements to. This data type is henceforth referred to
-as \texttt{d3.Selection}. The \texttt{data} argument was to take the full JSON \payload returned by
+as \texttt{d3.Selection}. The \texttt{data} argument took the full JSON \payload returned by
 the parser. The \texttt{constructor} would then turn the \texttt{data} \texttt{Object} into a
 \texttt{Map} object for more reliable access. To get more fine-grained access to the \svg document,
-the \texttt{constructor} also populated extra fields with selections of the whole shield element
-and the \texttt{<g id=``charge\_layers''>} element, defined within the \texttt{svg} selection. The
-\texttt{chargesLayer} field is needed for telling the renderer classes where to draw their shapes.
-Depending on the contents of the \payload, the \texttt{constructor} then instantiated new
-\texttt{ChargeRenderer} objects for all the \texttt{\charges}, or instantiated 4 new
-\texttt{Quarter} objects for all the \quarters.
+the \texttt{constructor} populated extra fields by selecting the whole shield element
+and the \texttt{<g id=``charge\_layers''>} element, that are defined within the \texttt{svg} selection. The
+\texttt{chargesLayer} field is required for telling the renderer classes where to draw their shapes.
+Depending on the contents of the JSON response, the \texttt{constructor} would then instantiate
+either new \texttt{ChargeRenderer} objects, or 4 new \texttt{Quarter} objects.
 
 \texttt{clearShield} was extracted from \texttt{index.ts} into \texttt{Blazon}, but with changes to
-account for many \texttt{<path>} nodes as well as \texttt{<clipPath>} elements. The method now
+account for many \texttt{<path>} nodes as well as \texttt{<clipPath>} elements. The method
 iterated over child elements of the \texttt{<g id=``charge\_layers''>}, which were \texttt{<g>},
 \texttt{<path>} and \texttt{<rect>} nodes, and \texttt{<clipPaths>} with an \texttt{id} beginning
 with \texttt{``quarterly\_''}, deleting them in the process. It also stripped the \texttt{shield}
@@ -748,8 +794,8 @@ method. This freed up the \texttt{draw} method to handle setting up the \svg doc
 \quarters and \charges to be drawn into, as well as applying clip paths.
 
 Whilst implementing \charge rendering within \quarters, I found that I needed to change the
-\texttt{chargesLayer} that \charges were being drawn in to. I decided to add a new method to update
-the \texttt{chargesLayer} after \texttt{ChargeRenderer} instantiation.
+layer that \charges were being drawn in to. I decided to add a new method to allow updating
+the \texttt{chargesLayer} after a \texttt{ChargeRenderer} object had been instantiated.
 
 The \texttt{getRandomInt} method was also extracted from the \texttt{index.ts} file
 into \texttt{ChargeRenderer} for \texttt{id} generation.
@@ -758,26 +804,20 @@ into \texttt{ChargeRenderer} for \texttt{id} generation.
 \label{ssub:quarter_renderer}
 
 \texttt{QuarterRenderer} extended \texttt{ChargeRenderer}, with few changes to what it inherited.
-In the \texttt{constructor}, rather than generating a random \texttt{id} for the quarter, it used
-the \texttt{charge: ECharge | EQuarter} parameter (that would be a member of \texttt{EQuarter} in
-this case). A new method \texttt{addClipPathDefinition(svg)} was also added. In \svg documents,
-clip paths are defined using \texttt{<clipPath>} elements inside a \texttt{<defs>} element at the
-top of the document. The \texttt{addClipPathDefinition} method selected the \texttt{<defs>} element
-and appended a \texttt{<clipPath>} element, before updating the \texttt{chargesLayer} and calling
-the inherited \texttt{drawCharge} method.
+Rather than generating a random \texttt{id} for the quarter, it used the \texttt{charge: ECharge |
+EQuarter} parameter (that would be a member of \texttt{EQuarter} in this case). A new method
+\texttt{addClipPathDefinition(svg)} was also added. In \svg documents, clip paths are defined using
+\texttt{<clipPath>} elements inside a \texttt{<defs>} element at the top of the document. The
+\texttt{addClipPathDefinition} method selected the \texttt{<defs>} element and appended a
+\texttt{<clipPath>} element, before updating the \texttt{chargesLayer} and calling the inherited
+\texttt{drawCharge} method.
 
-\subsection{Second Design Evaluation}%
+\subsection{Evaluation}%
 \label{sub:second_design_evaluation}
 
 This design iteration had brought quarterly rendering a lot closer to fruition, as seen in
-Figure~\ref{fig:second_iteration_progress}, where  but I had difficulties maintaining clean code whilst
-adding the functionality to apply quarter-specific transformations to scale and move \charges. To
-add this, I had to redesign both how \texttt{ChargeShapes} and how both \texttt{Renderer} classes
-worked.
-
-This design iteration had brought quarterly rendering a lot closer to fruition, as seen in
 Figure~\ref{fig:second_iteration_progress}, however proper scaling and translation of charges was
-yet to be implemented. The project aims were yet to be realised. In prototyping to add the
+yet to be implemented. The project aims were yet to be realised. When adding the
 functionality to apply quarter-specific transformations, I had difficulties maintaining clean,
 extensible code. To both satisfy the project aims and the code standards, I had to redesign how
 \texttt{ChargeShapes} and both \texttt{Renderer} classes worked.
@@ -820,32 +860,29 @@ extensible code. To both satisfy the project aims and the code standards, I had 
 \section{Refactoring Charge Rendering}%
 \label{sec:refactoring_charge_rendering}
 
-\subsection{Third Design Iteration}%
+\subsection{Design}%
 \label{sub:third_design_iteration}
 
 \subsubsection{\texttt{Renderer} Hierarchy}%
 \label{ssub:renderer_hierarchy}
 
 This new design made use of the \textit{Liskov Substitution} and Open/Closed
-principles~\autocite{martin2000design} (the Open/Closed principle being described in
-Section~\ref{ssub:design_principles}). The Liskov Substitution principle dictates that derived
-classes must be substitutable for their base class. This is well implemented with abstract classes
-as they provide a reliable interface and force inheriting classes to implement the abstracted
-methods defined within. As a reminder, the Open/Closed principle dictates that classes should be
-closed to modification but open to extension.
+principles~\autocite{martin2000design}. The Liskov Substitution principle dictates that derived
+classes must be substitutable for their base class. Abstract classes are a good application for
+this principle as they provide a reliable interface and force inheriting classes to implement the
+abstracted methods defined within. As a reminder, the Open/Closed principle dictates that classes
+should be closed to modification but open to extension.
 
-Applying these principle, I redesigned the rendering structure to have common methods and
+Applying these principles, I redesigned the rendering structure to have common methods and
 attributes belonging to both \texttt{ChargeRenderer} and \texttt{QuarterRenderer} in a new abstract
-parent class, \texttt{Renderer}. This helped refine and enforce the previously specified API of
-render classes having a main entry-point of \texttt{draw()}. Using an abstract class not only gave
-assurances to classes that used its implementations that there would always be a \texttt{draw()}
-function, but also gave child classes the shared functions that both required whilst allowing them
-to specialise in their individual use cases. It also meant that previously ambiguous attribute
-names could be named more specifically for the particular \texttt{Renderer} implementation. An
-example of this being that where \texttt{ChargeRenderer} previously had an attribute of
-\texttt{charge} with a union type of \texttt{ECharge | EQuarter}, the \texttt{charge} attribute
-could now have a type of just \texttt{ECharge} and \texttt{QuarterRenderer} could have an attribute
-of \texttt{quarter} with type \texttt{EQuarter}.
+parent class, \texttt{Renderer}. This refined and enforced the previously specified API of render
+classes having a main entry-point of \texttt{draw()}. Using an abstract class gave assurances to
+classes that used its implementations that there would always be a \texttt{draw()} function. It
+also gave child classes the shared functions that both required whilst allowing them to specialise
+in their individual use cases. This enabled previously ambiguous attributes to be renamed more
+specifically for their particular \texttt{Renderer} implementation. An example is where
+\texttt{ChargeRenderer} previously had \texttt{charge:~ECharge~|~EQuarter}, it now had
+\texttt{charge:~ECharge}.
 
 The planned execution for this design may be seen in Figure~\ref{fig:quarter_rendering}.
 
@@ -858,13 +895,13 @@ the \texttt{ChargeShapes}, a new abstract class, \texttt{AShape}, would be defin
 \texttt{dimensions} \texttt{Map} and a \texttt{transforms(transform: string): string} method. Each
 charge then extended \texttt{AShape}, implemented the two abstract properties and was imported by
 the \texttt{ChargeShapes} class. The \texttt{ChargeShapes} was redesigned to have a boolean
-function, \texttt{hasChargePath(charge: string)} to check if it knew the given charge.
-\texttt{ChargeShapes} also had a static function, \texttt{chargeShapes(charge: ECharge)} which
+function, \texttt{hasChargePath(charge: string)}, to check if it knew the given charge.
+\texttt{ChargeShapes} also had a static function, \texttt{chargeShapes(charge: ECharge)}, which
 returned an instance of \texttt{AShape}. This design makes use of the \textit{Dependency Inversion}
 principle~\autocite{martin2000design}, which says that a class should depend on abstractions,
 rather than concretions. In this case, when renderers call out to \texttt{ChargeShapes} for the
 relevant \texttt{chargeShapes} object, they are returned an \texttt{AShape} object. This increases
-reusability as well as extensibility of charge rendering as one just needs to create a new
+reusability as well as extensibility of charge rendering, as one just needs to create a new
 \texttt{AShape} class, import it into the \texttt{ChargeShapes} class and add it to the relevant
 methods.
 
@@ -913,7 +950,7 @@ hierarchy. \texttt{AQuarterShape} only exposed a \texttt{dimensions} \texttt{Map
   \label{fig:quarter_rendering}
 \end{figure}
 
-\subsection{Third Design Implementation}%
+\subsection{Implementation}%
 \label{sub:third_design_implementation}
 
 The Figure references in the following headings refer to the UML diagrams in
@@ -922,11 +959,11 @@ Appendix~\ref{sec:third_design_iteration_diagrams}.
 \subsubsection{\texttt{Renderer} (Figure~\ref{fig:RendererUML})}%
 \label{ssub:renderer}
 
-The new \texttt{Renderer} class contained 3 protected, inherited attributes, \texttt{chargeId:
+The new \texttt{Renderer} class contains 3 protected, inherited attributes, \texttt{chargeId:
 string}, \texttt{tincture: ETincture} and \texttt{parentChargesLayer: d3.Selection}. Whilst the
-class had 3 attributes, only \texttt{tincture} and \texttt{parentChargesLayer} were assigned in the
-constructor; inherited classes were given responsibility of generating their own \texttt{id}s. As
-mentioned in Section~\ref{sub:third_design_iteration}, \texttt{Renderer} defined an abstract method
+class has 3 attributes, only \texttt{tincture} and \texttt{parentChargesLayer} are assigned in the
+constructor; inherited classes are given responsibility of generating their own \texttt{id}s. As
+mentioned in Section~\ref{sub:third_design_iteration}, \texttt{Renderer} defines an abstract method
 of \texttt{draw(): void} to be implemented in inherited classes. The \texttt{updateChargesLayer}
 method was extracted from \texttt{ChargeRenderer} into the parent class to be available for both
 child classes to inherit and use. \texttt{getRandomInt} was similarly extracted.
@@ -934,62 +971,62 @@ child classes to inherit and use. \texttt{getRandomInt} was similarly extracted.
 \subsubsection{\texttt{ChargeRenderer} (Figure~\ref{fig:RendererUML})}%
 \label{ssub:chargerenderer}
 
-Now inheriting from \texttt{Renderer}, \texttt{ChargeRenderer} had just two attributes defined on
-it: \texttt{charge: ECharge} and \texttt{sinister: boolean}. The \texttt{draw} method now had an
-optional argument of \texttt{quarter: EQuarter} which would correspond to the \texttt{id} of the
-\texttt{<clipPath>} that contained this \charge. As before, the method performed environment setup
-in the \svg document ready for the new \charge, then called out to \texttt{drawCharge}, however
-after performing all this, \texttt{draw} now also called \texttt{applyTransforms}.
-\texttt{applyTransforms} took in the \texttt{currentCharge} element and an optional
-\texttt{quarter} argument, built a \texttt{transform} string based on the parameters, fetched the
-appropriate transformation from \texttt{ChargeShapes} and applied it to the \texttt{currentCharge}.
+Now inheriting from \texttt{Renderer}, \texttt{ChargeRenderer} has just two attributes defined on
+it: \texttt{charge: ECharge} and \texttt{sinister: boolean}. The \texttt{draw} method now has an
+optional argument of \texttt{quarter: EQuarter} which corresponds to the \texttt{id} of the
+\texttt{<clipPath>} that contains this \charge. As before, the method performs environment setup in
+the \svg document, preparing for the new \charge. It then calls out to \texttt{drawCharge},
+however, after performing all this, \texttt{draw} now also calls \texttt{applyTransforms}.
+\texttt{applyTransforms} takes in the \texttt{currentCharge} element and an optional
+\texttt{quarter} argument, builds a \texttt{transform} string based on the parameters, fetches the
+appropriate transformation from \texttt{ChargeShapes} and applies it to the \texttt{currentCharge}.
 
 \subsubsection{\texttt{QuarterRenderer} (Figure~\ref{fig:RendererUML})}%
 \label{ssub:quarterrenderer}
 
-As with \texttt{ChargeRenderer}, \texttt{QuarterRenderer} had only one attribute now defined on it:
+As with \texttt{ChargeRenderer}, \texttt{QuarterRenderer} now has only one attribute defined upon it:
 \texttt{quarter: EQuarter}. Whereas before, the \texttt{draw} method called out to
-\texttt{ChargeRenderer} to draw a quarter onto the shield, it now called its own
-\texttt{drawQuarter} method. \texttt{drawQuarter} had much the same functionality as
-\texttt{drawCharge} previously held, but exclusively worked on \texttt{QuarterShapes}.
+\texttt{ChargeRenderer} to draw a quarter onto the shield, it now calls its own
+\texttt{drawQuarter} method. \texttt{drawQuarter} adopts much the same functionality as
+\texttt{drawCharge} previously held, but exclusively works on \texttt{QuarterShapes}.
 \texttt{addClipPathDefinition} remained unchanged.
 
 \subsubsection{\texttt{AShape} and \texttt{AQuarterShape} (Figure~\ref{fig:AShapeUML})}%
 \label{ssub:ashape_and_aquartershape}
 
 As mentioned in Section~\ref{ssub:chargeshape_and_quartershape_abstraction}, \texttt{AShape}
-defined a pair of abstractions: the \texttt{dimensions} \texttt{Map} and the \texttt{transforms}
-method. The \texttt{dimensions} \texttt{Map} was a simple \texttt{Map<string, string>} containing
-relevant entries previously defined in the \texttt{ChargeShapes} class. \texttt{transforms} took a
-transform string as an argument, with implementations using a \texttt{switch} statement to match
+defines a pair of abstractions: the \texttt{dimensions} \texttt{Map} and the \texttt{transforms}
+method. The \texttt{dimensions} \texttt{Map} is a simple \texttt{Map<string, string>} containing
+relevant entries previously defined in the \texttt{ChargeShapes} class. \texttt{transforms} takes a
+transform string as an argument. Implementations use a \texttt{switch} statement to match
 against it to specify the necessary transformation.
 
-\texttt{AQuarterShape}, not needing any transformations, simply defined an abstract
-\texttt{dimensions} \texttt{Map} that paralleled that of \texttt{AShape}.
+\texttt{AQuarterShape}, not needing any transformations, simply defines an abstract
+\texttt{dimensions} \texttt{Map} that parallels that of \texttt{AShape}.
 
 \subsubsection{\texttt{ChargeShapes} (Figure~\ref{fig:ChargeShapesUML}) and \texttt{QuarterShapes}}%
 \label{ssub:chargeshapes_and_quartershapes}
 
 Having extracted all the previous dimensions into their own classes, \texttt{ChargeShapes} now
-provided a single point-of-access for all \charges. It had a private, static array containing the
-names of each imported \charge. To check whether the \charge could be drawn, it exposed a boolean
-function, \texttt{hasChargePath(charge: string)} that scanned over the array to check whether the
-argument given to it was contained within. A new function \texttt{chargeShapes(charge: ECharge)}
-was defined to replace the newly-removed \texttt{chargePaths} \texttt{Map} which returned a new
-object for the relevant \texttt{AShape}. When the \texttt{ChargeRenderer} called this, it was then able to
-chain methods together without concerns about which \texttt{AShape} it had been given.
+provides a single point-of-access for all \charges. It has a private, static array containing the
+names of each imported \charge. To check whether the \charge can be drawn, it exposes a boolean
+function, \texttt{hasChargePath(charge: string)}, that scans over the array to check whether the
+argument given to it is contained within. A new function \texttt{chargeShapes(charge: ECharge)} was
+defined to replace the \texttt{chargePaths} \texttt{Map}, returning a new object for the relevant
+\texttt{AShape}. When the \texttt{ChargeRenderer} calls this, it is able to chain methods
+together without concerns about which \texttt{AShape} it has been given.
 
-Again, to mirror the new \texttt{ChargeShapes} implementation, \texttt{QuarterShapes} was also
-defined with a sole \texttt{quarterShapes(quarter: EQuarter)} which returned a new object for the
+Again, to mirror the new \texttt{ChargeShapes} implementation, \texttt{QuarterShapes} is defined
+with a sole \texttt{quarterShapes(quarter: EQuarter)} method which returns a new object for the
 relevant \texttt{AQuarterShape}. The implementations for both \texttt{QuarterShapes} and
 \texttt{AQuarterShape} were unnecessarily verbose, but were done purposefully to be keep the code
 open-ended and extensible for future functionality.
 
-\subsection{Third Iteration Evaluation}%
-\label{sub:third_iteration_evaluation}
+\subsection{Evaluation}%
+\label{sub:third_design_evaluation}
 
-The project aim that I was pursuing was now realised, with quarterly shields being reliably drawn.
-Some examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_shields}.
+The project aim that I was pursuing is now realised, with quarterly shields being reliably drawn.
+Some examples, as drawn by the web app, can be seen in Figure~\ref{fig:quarterly_shields}.
 
 \begin{figure*}[h]
   \subfloat[A shield with the escutcheons of the 4 patron saints of the United Kingdom.]{%
@@ -1012,25 +1049,32 @@ Some examples as drawn by the web app can be seen in Figure~\ref{fig:quarterly_s
 \section{Automated Testing}%
 \label{sec:automated_testing}
 
-I had troubles with setting up integration tests to ensure that the web app was calling the
-libraries with correct parameters. However, as mentioned in
-Section~\ref{sec:external_dependencies}, I used jest~\autocite{jest} to write unit tests for some
-modules, specifically to ensure implementations of AShape were returning the correct data depending
-on their inputs.
+It was challenging to set up integration tests to ensure that the web app was calling the libraries
+with correct parameters. However, as mentioned in Section~\ref{sec:external_dependencies}, I used
+Jest~\autocite{jest} to write unit tests for some modules, specifically to ensure implementations
+of AShape were returning the correct data depending on their inputs.
 
 \section{Comparison With Existing Solutions}%
 \label{sec:comparison_with_existing_solutions}
 
 The other solution to this problem, as mentioned in Section~\ref{sec:related_works}, was
-pyBlazon~\autocite{pyblazon} which does not support quarterly shields, so only basic
-\glspl{escutcheon} may be compared. A comparison of both pyBlazon and this project rendering the
+pyBlazon~\autocite{pyblazon}. A comparison of both pyBlazon and this project rendering the
 blazon for the Scrope \gls{escutcheon} can be seen in figure~\ref{fig:pyblazon_scrope_comparison}.
 As noted in Section~\ref{sec:heraldry}, there are no shades specified for a tincture, hence the
-difference in colours of pyBlazon's bend and this project's.
+difference in colours of pyBlazon's bend and this project's, the former being yellow and the latter
+gold.
 
-\todo{Add more comparisons.}
+The web app for this project is about 3 times faster than pyBlazon in rendering the Scrope
+escutcheon. When measuring both sites using Firefox's performance tools on my laptop, the project
+web app took around 400ms to render the blazon, whilst pyBlazon took around 12,000ms. Whilst the
+project is considerably faster than pyBlazon, it should be noted that the project had pre-defined
+JSON to return and so didn't have to parse the blazon first.
 
-\begin{figure}
+When pyBlazon is given the \blazon for the right-hand \gls{escutcheon} in
+Figure~\ref{fig:quarterly_shields}, the website returns an HTTP \texttt{403 Forbidden} error, being
+unable to handle it. However, pyBlazon does not support quarterly \glspl{escutcheon}.
+
+\begin{figure}[h!]
   \centering
   \subfloat[pyBlazon]{%
     %\def\svgwidth{0.425\linewidth}%
@@ -1047,23 +1091,56 @@ difference in colours of pyBlazon's bend and this project's.
   \label{fig:pyblazon_scrope_comparison}
 \end{figure}
 
-\section{Shortcomings}%
+A restriction of my design was using just the British style of \glspl{escutcheon}, known as the
+heater style. Whilst this produces accurate results for British \glspl{escutcheon}, it produces
+incorrect renderings for other European \glspl{escutcheon}. Ignoring the laurel branches, the
+national \gls{escutcheon} of Greece uses a more modern shield shape that the project does not
+support. As seen in Figure~\ref{fig:greek_coa}, the \gls{ordinary} is correct and, as mentioned
+previously, the tincture is correct, shade and shield notwithstanding.
+
+\begin{figure}[h]
+  \centering
+  \subfloat[Source:~\url{https://upload.wikimedia.org/wikipedia/commons/7/7c/Coat_of_arms_of_Greece.svg}]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/Coat_of_arms_of_Greece.pdf_tex}
+  }
+  \qquad
+  \subfloat[This project]{%
+    \def\svgwidth{0.425\linewidth}%
+    \input{graphics/greek_shield.pdf_tex}
+  }
+  \caption{A comparison of the national \gls{escutcheon} of Greece (\textit{Azure, a cross
+  Argent.})}%
+  \label{fig:greek_coa}
+\end{figure}
+
+\pagebreak%
+
+\section{Limitations}%
 \label{sec:shortcomings}
 
 Due to time constraints, we were not able to integrate the front- and back-ends, with the server
 configured to return mocked out responses for well-formed blazons.
 
 In some quarters, the charges didn't fully fit, resulting in off-centred shapes to hide the visible
-field. An example of this can be seen in Figure~\ref{fig:quarterly_shields}, where the bottom right
+field. An example of this can be seen in Figure~\ref{fig:escaping_bounds}, where the bottom right
 saltire is not aligned with the saltire above it. Similarly, the saltire in the top right corner
 should sit much higher within the quarter. This was due to drawing the saltire to match the
 dimensions of the shield outline, but not accounting for the differing dimensions of redrawing this
 within a quarter. A fix for this particular issue would be to draw the shapes much larger than
 their intended bounds and rely on \svg clip paths to keep the shape within the outline.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\linewidth]{escaping_bounds}
+  \caption{An enlarged image demonstrating the saltire not fulfilling the quarter in its bottom
+  left and right corners.}
+  \label{fig:escaping_bounds}
+\end{figure}
+
 The project is currently only designed to accept correctly-formed data and does not handle
 ill-formed data properly, short of throwing an exception. Ideally, it should be able to reject and
-recover from ill-formed responses from the server, either through checking the validity of the data
+recover from ill-formed responses received from the server, either through checking the validity of the data
 before working on it or through ignoring data that cannot be processed. More feedback to the user
 should also be given, should they enter a blazon that is unable to be parsed.
 
@@ -1073,17 +1150,44 @@ should also be given, should they enter a blazon that is unable to be parsed.
 \section{Overview}%
 \label{sec:overview}
 
-\todo{Write conclusion}
+I achieved the project aim, designing and implementing a web app to render the \blazon by
+drawing \charges and \glspl{ordinary}. Several blazons used in this report have been rendered by
+the web app, including Figures~\ref{fig:chief_example},~\ref{fig:scrope}
+and~\ref{fig:quarterly_shields}.
+
+I applied the good software engineering practises of delegating and decoupling, as well as the four
+principles laid out by~\citet{martin2000design}: \textit{Single Responsibility},
+\textit{Open/Closed}, \textit{Liskov Substitution} and \textit{Dependency Inversion}. As a reminder
+these principles are defined as follows:
+
+\begin{itemize}
+  \item \textit{The Single Responsibility principle} --- a class should have one, and only one,
+    reason to change;
+  \item \textit{The Open/Closed principle} --- you should be able to extend a class's behaviour,
+    without modifying it;
+  \item \textit{The Liskov Substitution principle} --- derived classes must be substitutable for
+    their base classes, and
+  \item \textit{The Dependency Inversion principle} --- depend on abstractions, not on concretions.
+\end{itemize}
+
+The Single Responsibility principle was used in all classes: splitting up any classes that started
+to develop overlapping functionality. The Open/Closed principle was applied in the
+\texttt{Renderer} hierarchy to ensure shared functions were defined in the parent class, whilst the
+child classes would both adhere to the same API for the rest of the web app to use. The Liskov
+Substitution principle applied to the \texttt{AShape} and \texttt{AQuarterShape} design, allowing
+for easy extension in the future should more shapes need to be drawn. The Dependency Inversion
+principle is applied to particular effect in the \texttt{ChargeShapes} method for chaining methods
+together without concerns of the underlying implementation.
 
 \section{Further Work}%
 \label{sec:further_work}
 
-Initial further work would be to make the fixes I have outlined in Section~\ref{sec:shortcomings}.
+Initial further work would be to implement the fixes I have outlined in Section~\ref{sec:shortcomings}.
 
-An immediate piece of further work would be to add more shapes to \texttt{ChargeShapes}, such that
-the web app would be able to draw more \blazons. Given the current implementation, there is
-potential to implement \glspl{variation}-based \blazons through use of \svg clip paths. Similarly,
-adding support for drawing of \charges such as lions and fleur-de-lis might wished to be added.
+Other extra changes would be to add more shapes to \texttt{ChargeShapes}, such that the web app
+would be able to draw more \blazons. Given the current implementation, there is potential to
+implement \glspl{variation}-based \blazons through use of \svg clip paths. Similarly, adding
+support for drawing of \charges such as lions and fleur-de-lis might wished to be added.
 
 \backmatter%
 
