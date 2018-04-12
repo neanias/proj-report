@@ -366,22 +366,23 @@ All relevant heraldry terminology may be found in the Glossary on page~\pageref{
 \label{sec:core_concepts}
 
 The two languages chosen for implementing this project were Python~\autocite{python} and
-TypeScript~\autocite{typescript}. Python seemed like an obvious choice with its good support for
+TypeScript~\autocite{typescript}. Python was an optimal choice due to its good support for
 \gls{nlp} through the \gls{nltk}~\autocite{bird2004nltk}. TypeScript is a typed superset of
-JavaScript written by Microsoft that compiles to plain JavaScript.  TypeScript was chosen as a
-nicer alternative to programming in pure JavaScript, thanks to the addition of powerful features
-such as types, access control and abstract classes. As a note to the reader, to maintain
-interoperability with JavaScript, TypeScript adds type definitions after the variable name, rather
-than before it, as in C. An example being that an \texttt{int} defined in C would be \texttt{int
-limit}, but in TypeScript, this would be \texttt{limit: number}. (JavaScript/TypeScript also has a
-unified \texttt{number} type to handle both \texttt{float}s and \texttt{int}s.)
+JavaScript written by Microsoft that compiles to plain JavaScript. TypeScript was chosen as a more
+expressive alternative to programming in pure JavaScript, thanks to the addition of powerful
+features such as type assertions, access control and abstract classes. As a note to the reader, to
+maintain interoperability with JavaScript, TypeScript adds type definitions after the variable
+name, rather than before it, as in C. An example being that an \texttt{int} defined in C would be
+`\texttt{int limit}', but in TypeScript, this would be `\texttt{limit:
+number}'~\footnote{JavaScript/TypeScript uses a unified \texttt{number} type to handle both
+\texttt{float}s and \texttt{int}s.}.
 
 The core design for this project centres around having a split stack; with a Python back-end
 parsing the \blazon, serialising it into JSON\footnote{\gls{json} is a lightweight data-interchange
   format, consisting of key-value pairs, array data types and other serialisable data types (such
   as strings, numbers and booleans). JSON is derived from JavaScript's associative array-style data
 type, \texttt{Object}. An example of JSON can be seen in Figure~\ref{fig:expected_output}.} and
-passing it to the TypeScript front-end, which would then draw it onto the webpage. This allowed for
+passing it to the TypeScript front-end, which would then draw it onto the webpage. This allows for
 large amounts of flexibility, enabling the two halves of the project to be developed in tandem with
 the Separation of Concerns principle being adhered to throughout. It also allows for pluggable
 rendering implementations as the JSON schema for drawing \payloads can be well-defined.
@@ -389,7 +390,7 @@ rendering implementations as the JSON schema for drawing \payloads can be well-d
 The Python back-end receives a JSON \payload from the webpage containing the \blazon; it parses the
 \blazon using a Context-Free Grammar (CFG) parser and identifies the most important parts of the
 \blazon. It then serialises these back into a JSON response to be sent to the webpage for rendering.
-The specification was such that if the webpage was given a \blazon of ``Azure, a bend Or'', it would
+The specification stated that if the webpage was given a \blazon of ``Azure, a bend Or'', it would
 return the JSON response seen in Figure~\ref{fig:expected_output}.
 
 \begin{figure}[h]
@@ -402,9 +403,11 @@ return the JSON response seen in Figure~\ref{fig:expected_output}.
       }]
     }
   \end{verbatim}
-  \caption{Expected response from the Python back end, for a given \blazon of ``Azure, a bend Or''.}%
+  \caption{Expected response from the Python back-end, for a given \blazon of ``Azure, a bend Or''.}%
   \label{fig:expected_output}
 \end{figure}
+
+\pagebreak%
 
 The TypeScript front-end receives this response, applies the \texttt{azure} CSS class to the field
 element, then draws a bend onto the field with an \texttt{or} CSS class. The rendering of this
@@ -423,19 +426,16 @@ For version control, \texttt{git}~\autocite{git} was used and all code was hoste
 
 The front-end depends on a pair of libraries for \svg rendering and \dom manipulation: the
 selection library of D3.js~\autocite{d3js} and jQuery~\autocite{jquery}. D3.js and jQuery both
-provide many powerful functions for \svg and \dom manipulation. The Mozilla Developer Network
-defines the \dom as such: ``The \glsentryfirst{dom} connects web pages to scripts or programming
-languages. Usually that means JavaScript, but modelling HTML, SVG, or XML documents as objects is
-not part of the JavaScript language. The \dom model represents a document with a logical tree.
-Each branch of the tree ends in a node, and each node contains objects. \dom methods allow
-programmatic access to the tree; with them you can change the document's structure, style or
-content. Nodes can have event handlers attached to them. Once an event is triggered, the event
-handlers get executed.''~\autocite{mdn_dom}.
+provide many powerful functions for \svg and \dom manipulation.  The \gls{w3c} \dom standard
+defines the \dom as ``a platform and language-neutral interface that allows programs and scripts to
+dynamically access and update the content, structure, and style of a document.'' The Mozilla
+Developer Network adds to this, saying the \dom ``represents a document with a logical tree. Each
+branch of the tree ends in a node, and each node contains objects.''~\autocite{mdn_dom}.
 
 For further assets, Sass~\autocite{sass-lang} (a CSS extension language) was used as a CSS
-pre-processor and Bootswatch~\autocite{bootswatch-flatly} (a predefined CSS theme) was used for the
-base styling.  Webpack~\autocite{webpack} was used to compile TypeScript down to JavaScript ---
-minifying and uglifying it in the process --- and to concatenate all source files and their
+pre-processor in combination with Bootswatch~\autocite{bootswatch-flatly} (a predefined CSS theme)
+for the base styling. Webpack~\autocite{webpack} compiled TypeScript down to JavaScript ---
+minifying and uglifying it in the process --- and concatenated all source files and their
 dependencies into one main JavaScript file. \textit{\Gls{minification}} of JavaScript assets
 involves stripping out all unnecessary whitespace and tokens.  \textit{\Gls{uglification}}
 transforms the JavaScript code by renaming all variables and functions into short, obfuscated names
@@ -445,10 +445,10 @@ as the browser has to download smaller asset resources than the original, raw so
 \subsection{Development Dependencies}%
 \label{sub:development_dependencies}
 
-To maintain code quality, TSLint~\autocite{tslint} (a TypeScript code linter) was used and set up to
+To maintain code quality, TSLint~\autocite{tslint} (a TypeScript code linter) was set up to
 automatically run as part of the Travis \gls{ci}~\autocite{travis} service, causing a build to fail
 if the linter detected a style violation. For unit testing, Jest~\autocite{jest} (with
-ts-jest~\autocite{ts-jest} for TypeScript support) was used, especially for its powerful mocking
+ts-jest~\autocite{ts-jest} for TypeScript support) was selected especially for its powerful mocking
 and expectation matcher functionality. Automated documentation generation was provided by
 TypeDoc~\autocite{typedoc}.
 
@@ -456,11 +456,11 @@ TypeDoc~\autocite{typedoc}.
 \label{sec:iterative_design}
 
 An iterative design was used for writing the code for this project. Iterative design is a cyclical
-process of designing, prototyping and evaluating. One designs and prototypes a new feature before
-evaluating the final feature design. If the design is acceptable, the new feature is implemented,
-otherwise the cycle restarts. An iterative design process enables one to address different functionality
-as separate tasks, building on top of one another. It also allows for heavy refactors of a project
-whilst staying in one cycle.
+process of designing, prototyping and evaluating. In other words, one designs and prototypes a new
+feature before evaluating the final feature design. If the design is acceptable, the new feature is
+implemented, otherwise the cycle restarts. An iterative design process enables one to address
+different functionality as separate tasks, building on top of one another. It also allows for
+extensive refactors of a project whilst staying within one cycle.
 
 \chapter{Implementation}%
 \label{cha:implementation}
