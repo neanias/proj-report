@@ -196,10 +196,10 @@ Following this chapter, the report is broken up into further 5 chapters with the
 
 Many families, countries and organisations --- primarily in Europe --- have coats of arms. Coats of
 arms were initially used on shields on the battlefield to identify individual knights, but later
-came to be used as flags and banners for individuals and families of the upper class at court. The
-Royal Coat of Arms of the United Kingdom, belonging to the British monarch, can be seen in
+came to be used as flags and banners for individuals and families of the upper classes at court.
+The Royal Coat of Arms of the United Kingdom, belonging to the British monarch, can be seen in
 Figure~\ref{fig:royal_coa}. If the reader wishes to learn more about heraldry and its history, I
-would recommend the many heraldic works of Charles Boutell and John Brooke-Little.
+would recommend the heraldic works of Charles Boutell and John Brooke-Little.
 
 \begin{marginfigure}
   \centering
@@ -227,7 +227,7 @@ difficulty in parsing the \blazons as the language loses some of its regularity.
   \label{fig:blason_albert}
 \end{marginfigure}
 
-\ublazons have a few key attributes:
+\ublazons have 5 key attributes:
 \begin{itemize}
   \item The \textit{\gls{field}}, which is the background colour of the shield or
     \quarter;
@@ -247,30 +247,29 @@ derived from Norman French and so the names appear archaic. In heraldry, blue is
 red is \textit{gules} for instance. The metals are \textit{or} and \textit{argent}, for gold and
 silver respectively. Whilst the tinctures are linked to colours, the College of Arms does not
 specify which shade of that colour is required for the tinctures, leaving it to the artist to
-decide~\autocite{college_of_arms_faq}. In this case, I have used default CSS colours, using the
-English names, for instance `red' for \textit{gules}.
+decide~\autocite{college_of_arms_faq}. In this case, I have applied default CSS colours, using the
+English names, for instance, `red' for \textit{gules}.
 
 \begin{marginfigure}
   \centering
   \def\svgwidth{0.8\linewidth}
   \input{graphics/chief_example.pdf_tex}
-  \caption{\textit{Purpure, a chief Gules}.}%
+  \caption{\textit{Purpure, a chief Gules}, as drawn by the project web app.}%
   \label{fig:chief_example}
 \end{marginfigure}
 
-\ublazons conventionally follow a form of starting with the \textit{\gls{tincture}} or
-\textit{\gls{variation}} of the field. After the description of the field,
-\textit{\glspl{ordinary}} and \textit{\charges} are named with their tinctures. An example of
-this is ``\textit{Purpure, a chief Gules}''. This \blazon describes an escutcheon with a field of
-\textit{purpure} (purple), with a \textit{Chief} \gls{ordinary} (a bar across the top of the
-shield) of \textit{gules} (red). This can be seen (drawn by the project web app) in
-Figure~\ref{fig:chief_example}.
+\ublazons conventionally start with the \textit{\gls{tincture}} or \textit{\gls{variation}} of the
+field. After the description of the field, \textit{\glspl{ordinary}} and \textit{\charges} are
+named with their tinctures. An example of this is ``\textit{Purpure, a chief Gules}''. This \blazon
+describes an escutcheon with a field of \textit{purpure} (purple), with a \textit{Chief}
+\gls{ordinary} (a bar across the top of the shield) of \textit{gules} (red). This can be seen
+ in Figure~\ref{fig:chief_example}.
 
 \begin{marginfigure}
   \centering
   \def\svgwidth{0.8\linewidth}
   \input{graphics/scrope.pdf_tex}
-  \caption{The Scrope \gls{escutcheon}; \textit{Azure, a bend Or}.}%
+  \caption{The Scrope \gls{escutcheon}; \textit{Azure, a bend Or}, as drawn by the project web app.}%
   \label{fig:scrope}
 \end{marginfigure}
 
@@ -278,8 +277,8 @@ A simple, but notable, \blazon is that of the Scrope family. In the 14th century
 brought a case action against Sir Robert Grosvenor when he noticed that they both had the same coat
 of arms. Many witnesses gave evidence in the case, including Geoffrey
 Chaucer~\autocite{scrope_grosvenor}. The case was ultimately decided in Scrope's favour. The Scrope
-coat of arms has a \blazon of \textit{Azure, a bend Or}; a depiction of this (as drawn by the
-project web app written for this project) can be seen in Figure~\ref{fig:scrope}.
+coat of arms has a \blazon of \textit{Azure, a bend Or}; a depiction of this can be seen in
+Figure~\ref{fig:scrope}.
 
 Whilst the Scrope arms are prominent in heraldry, they are simplistic and indicative of
 medieval arms. Coats of arms became more complex as they developed through the centuries, with
@@ -291,50 +290,58 @@ shields are seen in duchies' coats of arms, particularly those which were given 
 illegitimate children. Examples of more complex shields can be seen in
 Figure~\ref{fig:complex_shields}.
 
-\begin{figure*}[h]
-  \subfloat[Neville, 16th Earl of Warwick's coat of arms. An example of grand-quarterlies and
-  differenced arms. Source:~\url{https://upload.wikimedia.org/wikipedia/commons/d/d1/Neville_Warwick_Arms.svg}.]{%
-    \def\svgwidth{0.3\linewidth} %
-    \input{graphics/Neville_Warwick_Arms.pdf_tex}
-  }
-  \qquad
-  \subfloat[A quarterly shield drawn by the web app. \textit{Quarterly: 1st and 4th: Gules, a bend
-  Sable; 2nd and 3rd: Azure, a chief Or}. ]{%
-    \def\svgwidth{0.28\linewidth}
-    \input{graphics/quarterly_example.pdf_tex}
-  }
-  \caption{Some examples of more complex coats of arms.}\label{fig:complex_shields}
-\end{figure*}
+\begin{marginfigure}
+  \centering
+  \includegraphics[width=\linewidth]{of_the_first}
+  \caption{\textit{Azure on a fess argent three billets azure} as rendered by \textit{pyBlazon}.
+  See Section~\ref{sec:related_works}.}%
+  \label{fig:of_the_first}
+\end{marginfigure}
 
 For a time, it was considered bad form to repeat a \textit{tincture} in a \blazon, and use a
 reference to the tincture's previous use. The Heraldic Society gives an example as such:
 ``\textit{`Azure on a fess argent three billets azure'} [would have been written as] \textit{`Azure
 on a fess argent three billets of the first'}''. The `\textit{of the first}' refers to the field's
 tincture of azure. This \blazon describes a blue shield, with a white bar horizontally across the
-middle with 3 white rectangles arranged along the bar. The Heraldic Society advocates repeating
+middle with 3 white rectangles arranged along the bar. A rendering of this can be seen in
+Figure~\ref{fig:of_the_first}. The Heraldic Society advocates repeating
 tinctures to reduce ambiguity~\autocite{blazon_in_coa}.
+
+\begin{figure}[h]
+  \subfloat[Neville, 16th Earl of Warwick's coat of arms. An example of grand-quarterlies and
+  differenced arms. Source:~\url{https://upload.wikimedia.org/wikipedia/commons/d/d1/Neville_Warwick_Arms.svg}.]{%
+    \def\svgwidth{0.48\linewidth} %
+    \input{graphics/Neville_Warwick_Arms.pdf_tex}
+  }
+  \qquad
+  \subfloat[A quarterly shield drawn by the web app. \textit{Quarterly: 1st and 4th: Gules, a bend
+  Sable; 2nd and 3rd: Azure, a chief Or}. ]{%
+    \def\svgwidth{0.45\linewidth}
+    \input{graphics/quarterly_example.pdf_tex}
+  }
+  \caption{2 examples of more complex coats of arms.}\label{fig:complex_shields}
+\end{figure}
 
 \section{Related Works}%
 \label{sec:related_works}
 
-The problem at hand has been partially solved before: Robert Billard wrote
+Rendering \blazons has been partially implemented before: Robert Billard wrote
 \textit{Blazons!}~\autocite{dos_blazon} for Windows 3.1 and 95 and Mark Shoulson and Arnt Richard
-Johansen wrote \textit{pyBlazon}~\autocite{pyblazon} in 2008. \textit{Blazon!} does not parse a
+Johansen created \textit{pyBlazon}~\autocite{pyblazon} in 2008. \textit{Blazon!} does not parse a
 blazon for automatic rendering, but provides an environment with predefined \charges and
 \glspl{ordinary} to build one's own \glspl{escutcheon}. \textit{pyBlazon} solves the problem
-exceptionally well, but only solves it for basic escutcheons, and does not render quarterly
-shields. Thus, a primary goal of this project is to support this. \textit{pyBlazon}, as the name
-suggests, is implemented in Python~\autocite{python} and hosted in a PHP webserver. My plan to implement the
-rendering in TypeScript~\autocite{typescript} (see Section~\ref{sec:core_concepts}) would aid portability as the code
-would be able to run on all modern browsers, whilst also being decoupled from the back-end,
+exceptionally well, but does not render quarterly shields. Thus, a major goal of this project is to
+support this. \textit{pyBlazon}, as the name suggests, is implemented in Python~\autocite{python}
+and hosted in a PHP webserver. My approach to implement the rendering in
+TypeScript~\autocite{typescript} (see Section~\ref{sec:core_concepts}) would aid portability, as
+the code would be able to run on all modern browsers, whilst also being decouple from the back-end,
 allowing pluggable implementations of the parsing.
 
-Despite these tools existing, many escutcheons drawn and uploaded to WikiMedia in
-\svg~\autocite{ferraiolo2000scalable} format appear to have been created in
-Inkscape~\autocite{inkscape}, rather than being created using the developed tools. Much work has
-been done in collecting and cataloguing \blazons themselves (especially John Papworth as
-mentioned in Section~\ref{sec:motivation}) giving plenty of examples against which to test the
-finally completed application.
+Despite the existence of these tools, they seem rarely used. Many escutcheons drawn and uploaded to
+WikiMedia in \svg~\autocite{ferraiolo2000scalable} format appear to have been created in
+Inkscape~\autocite{inkscape}. Much work has been done in collecting and cataloguing \blazons
+themselves (especially John Papworth as mentioned in Section~\ref{sec:motivation}) giving plenty of
+examples against which to test the finally completed application.
 
 \section{Summary}%
 \label{sec:background_summary}
